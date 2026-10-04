@@ -19,7 +19,7 @@ public class Main {
             new GeneradorComprobante(),
             new NotificadorTransferencia(new CanalNotificacionCompuesto(
                 List.of(new SmsGateway(), new PushGateway()))),
-            new RegistroAuditoria()
+            new AuditoriaCompuesta(List.of(new RegistroAuditoria(), new SistemaAntifraude()))
         );
         servicio.transferir(ana, luis, 150_000, "OTRO_BANCO");
 
