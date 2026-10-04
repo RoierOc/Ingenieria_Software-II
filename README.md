@@ -146,13 +146,18 @@ Criterio de aceptación: "TransferenciaLlaveTest" transfiere $50.000 por llave y
 
 ### R2 — Cuenta infantil
 
-"CuentaInfantil" hereda de "Cuenta" y sobrescribe "retirar": lleva el acumulado retirado en el día y rechaza con "IllegalStateException" el retiro que haga superar $200.000, antes de tocar el saldo. El acumulado se reinicia al cambiar de fecha. La fecha se obtiene de un "Clock" que se puede inyectar en las pruebas. Los depósitos se heredan sin límite.
+Estimación en el código original: 0 archivos existentes. "CuentaInfantil" podía heredar de "Cuenta" como un archivo nuevo y sobrescribir "retirar". Al implementarlo apareció el problema de la cuota de manejo descrito abajo, que en el código original habría obligado a modificar también "Cuenta.java" y "CobroCuotaManejo.java".
 
-Como es una "Cuenta", funciona sin cambios como origen en "TransaccionService" (que recibe "CuentaTransaccional") y en "CobroCuotaManejo" (que recibe "List<Cuenta>"). Por eso no se modificó ningún archivo existente.
+Implementación: se creó "CuentaInfantil", que hereda de "Cuenta" y sobrescribe "retirar" para acumular los retiros del día. Si el nuevo retiro supera $200.000, lanza "IllegalStateException" antes de descontar el saldo. Los depósitos se heredan sin cambios. Para probar el cambio de día sin esperar, la cuenta puede recibir un "Clock"; si no se entrega uno, usa el reloj del sistema.
 
-Criterio de aceptación: "CuentaInfantilTest" retira $150.000, intenta retirar $60.000, recibe el rechazo y comprueba que el saldo sigue en $850.000. Otras pruebas cubren el reinicio al día siguiente, los depósitos sin límite, la transferencia desde la cuenta infantil y el cobro de la cuota.
+La primera versión se pudo extender sin tocar archivos existentes, pero reintroducía el fallo del CDT. Con "CobroCuotaManejo" usando "retirar", la cuota de una cuenta infantil que ya hubiera retirado $200.000 ese día lanzaría una excepción y detendría el lote nocturno, el mismo problema que el CDT causaba en el bloque 1. La cuota es un cargo del banco y no un retiro del cliente, así que se separaron las dos operaciones y se modificaron 2 archivos existentes:
 
-Análisis honesto: "CuentaInfantil" agrega una condición al retiro que "Cuenta" no tiene. Usa la misma excepción que "Saldo insuficiente", así que quien ya maneja ese rechazo no se rompe. Aun así, el diseño no aguantó del todo bien en un punto: "CobroCuotaManejo" cobra con "retirar", de modo que la cuota de manejo cuenta para el límite diario. Si el menor ya retiró $200.000 ese día, el cobro de su cuota se rechaza y el lote se detiene, igual que con una cuenta sin saldo. La comisión de una transferencia también cuenta para el límite. Propuesta: separar el cargo que hace el banco (cuota) del retiro que hace el cliente, por ejemplo con un método de débito propio para cargos en "Cuenta", y hacer que el cobro mensual registre los rechazos en vez de detenerse.
+- "Cuenta.java": nuevo método "cobrarCargo", declarado "final" para que ninguna subclase le agregue restricciones. Solo verifica el saldo disponible.
+- "CobroCuotaManejo.java": usa "cobrarCargo" en lugar de "retirar".
+
+Lección para el diseño: en el control L, "Cuenta.retirar" seguía siendo una operación que las subclases podían restringir. Como el cobro dependía de ella, la jerarquía no estaba protegida frente a nuevas cuentas con reglas de retiro.
+
+La prueba "CuentaInfantilTest" verifica el criterio de aceptación: con $150.000 retirados ese día, un retiro de $60.000 se rechaza y el saldo no cambia. También comprueba que el límite se reinicia al día siguiente, que los depósitos no tienen límite, que la cuenta sirve como origen de transferencias y que se le cobra la cuota aunque ya haya alcanzado el límite. Una transferencia queda sujeta al mismo límite, incluida su comisión: con $150.000 retirados, una transferencia a otro banco de $45.000 ($52.500 con la comisión) se rechaza sin mover dinero. La salida del programa principal no cambia.
 
 ### R3 — Notificaciones push
 
@@ -177,16 +182,18 @@ Análisis honesto: el antifraude reutiliza la interfaz "AuditoriaTransferencia",
 | Req. | Archivos a modificar en el código original (estimado) | Archivos existentes modificados (real) | Archivos nuevos | ¿Se rompió alguna prueba? |
 |---|---|---|---|---|
 | R1 | 1: "TransaccionService.java" (nuevo "case" en el "switch") | 1: "Main.java" | 2: "ComisionLlave.java", "TransferenciaLlaveTest.java" | No |
-| R2 | 0: una clase nueva que herede de "Cuenta" y sobrescriba "retirar" | 0 | 2: "CuentaInfantil.java", "CuentaInfantilTest.java" | No |
+| R2 | 0: una clase nueva que herede de "Cuenta" y sobrescriba "retirar" | 2: "Cuenta.java", "CobroCuotaManejo.java" | 2: "CuentaInfantil.java", "CuentaInfantilTest.java" | No |
 | R3 | 1: "TransaccionService.java" (crear "PushGateway" con "new" y llamarlo), más el archivo nuevo del gateway | 1: "Main.java" | 4: "PushGateway.java", "CanalNotificacionCompuesto.java", "NotificacionPushTest.java", "SalidaConsola.java" | No |
 | R4 | 1: "TransaccionService.java" (nueva llamada después de la auditoría) | 1: "Main.java" | 3: "SistemaAntifraude.java", "AuditoriaCompuesta.java", "AntifraudeTest.java" | No |
 | R5 | 1: "TransaccionService.java" (reemplazar "new OracleRepositorio()"), más el archivo nuevo de PostgreSQL | 1: "Main.java" | 1: "PostgresRepositorio.java" | No |
 
-Al terminar los cinco requerimientos se ejecutan 13 pruebas: las 5 del bloque 3, sin cambios, y 8 nuevas. Todas pasan.
+Al terminar los cinco requerimientos se ejecutan 15 pruebas: las 5 del bloque 3, sin cambios, y 10 nuevas. Todas pasan.
 
 ### Análisis
 
-En el código original, R1, R3, R4 y R5 caen en "TransaccionService", la clase que mueve el dinero y que no se podía probar sin Oracle ni SMS. En el código refactorizado, el único archivo existente que cambió fue "Main.java", el punto donde se arma el sistema; la lógica de transferencia no se tocó en ningún requerimiento. El número de archivos modificados es parecido (4 en ambos casos), pero el riesgo no: un error al editar "Main" afecta la configuración, mientras que un error al editar "transferir" puede cobrar mal una transferencia. Además, cada requerimiento quedó con pruebas propias que corren sin infraestructura.
+En el código original, R1, R3, R4 y R5 caen en "TransaccionService", la clase que mueve el dinero y que no se podía probar sin Oracle ni SMS. En el código refactorizado, R1, R3, R4 y R5 solo cambiaron "Main.java", el punto donde se arma el sistema; la lógica de transferencia no se tocó en ningún requerimiento. Un error al editar "Main" afecta la configuración, mientras que un error al editar "transferir" puede cobrar mal una transferencia. Además, cada requerimiento quedó con pruebas propias que corren sin infraestructura.
+
+R2 fue el requerimiento que el diseño no aguantó por sí solo. Para que el cobro de la cuota no dependiera de las reglas de retiro de cada cuenta hubo que modificar "Cuenta.java" y "CobroCuotaManejo.java", así que la suma de la columna de archivos existentes modificados es 6 (3 archivos distintos): "Main.java" en cuatro requerimientos, y "Cuenta.java" y "CobroCuotaManejo.java" en R2. El cambio de R2 corrige un punto débil que había quedado del control L y deja la jerarquía protegida para la próxima cuenta con restricciones de retiro.
 
 ### Salida del programa después del bloque 4
 

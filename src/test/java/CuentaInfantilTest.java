@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CuentaInfantilTest {
     private static final Instant HOY = Instant.parse("2026-10-04T15:00:00Z");
@@ -79,6 +80,43 @@ class CuentaInfantilTest {
         assertAll(
             () -> assertEquals(387_100, infantil.getSaldo()),
             () -> assertEquals(100_000, destino.getSaldo())
+        );
+    }
+
+    @Test
+    void transferenciaQueSuperaElLimiteConLaComisionSeRechaza() {
+        CuentaInfantil infantil = new CuentaInfantil("INF-1", "Sofía", 1_000_000, Clock.fixed(HOY, BOGOTA));
+        Cuenta destino = new CuentaAhorros("002", "Luis", 0);
+        RepositorioEnMemoria repositorio = new RepositorioEnMemoria();
+        TransaccionService servicio = new TransaccionService(
+            new ValidadorTransferencia(),
+            new CalculadoraComision(Map.of("OTRO_BANCO", new ComisionOtroBanco())),
+            repositorio, (cuentaOrigen, cuentaDestino, monto, comision) -> {},
+            new NotificadorEnMemoria(), (cuentaOrigen, cuentaDestino, monto, tipo) -> {}
+        );
+        infantil.retirar(150_000);
+
+        assertThrows(IllegalStateException.class,
+            () -> servicio.transferir(infantil, destino, 45_000, "OTRO_BANCO"));
+
+        assertAll(
+            () -> assertEquals(850_000, infantil.getSaldo()),
+            () -> assertEquals(0, destino.getSaldo()),
+            () -> assertTrue(repositorio.transacciones.isEmpty())
+        );
+    }
+
+    @Test
+    void laCuotaDeManejoSeCobraAunqueYaAlcanzoElLimiteDiario() {
+        CuentaInfantil infantil = new CuentaInfantil("INF-1", "Sofía", 500_000, Clock.fixed(HOY, BOGOTA));
+        Cuenta ahorros = new CuentaAhorros("002", "Luis", 100_000);
+        infantil.retirar(200_000);
+
+        new CobroCuotaManejo().cobrarMensual(List.of(infantil, ahorros));
+
+        assertAll(
+            () -> assertEquals(287_100, infantil.getSaldo()),
+            () -> assertEquals(87_100, ahorros.getSaldo())
         );
     }
 }

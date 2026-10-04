@@ -7,6 +7,10 @@ public class Cuenta extends ProductoConSaldo implements ProductoBancario, Cuenta
         descontarSaldo(monto);
     }
 
+    public final void cobrarCargo(double monto) {
+        descontarSaldo(monto);
+    }
+
     @Override
     public String generarExtracto() {
         return "Cuenta " + numero + " - saldo: $" + saldo;
