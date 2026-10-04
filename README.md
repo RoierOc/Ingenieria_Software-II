@@ -79,3 +79,15 @@ Si alguien propone envolver el retiro en un try/catch e ignorar los CDT, ¿por q
 Solo oculta el fallo durante la ejecución. El CDT seguiría presentado como una cuenta sustituible aunque no cumpla el contrato de retiro, y otros clientes de esa jerarquía podrían encontrar el mismo problema.
 
 Se extrajo el estado común a "ProductoConSaldo". "Cuenta" conserva el retiro libre sujeto al saldo disponible; "CDT" conserva su restricción de vencimiento. "Main" declara el CDT con su tipo propio.
+
+### Punto de control I
+
+¿Pudieron lograr que un mismo generador de extractos funcione para cuentas, tarjetas y créditos a la vez?
+
+Sí. "GeneradorExtractos" puede imprimir una lista que contenga "CuentaAhorros", "TarjetaCredito" y "CreditoVivienda".
+
+¿Qué interfaz necesitó para eso, y por qué no necesitó conocer los demás métodos de cada producto?
+
+"ProductoBancario", reducida al método "generarExtracto". El generador solo necesita obtener e imprimir ese texto; no utiliza depósitos, retiros, intereses ni pagos.
+
+Los métodos "calcularIntereses" y "pagarCuota" se agruparon en "ProductoCredito", implementada por la tarjeta y el crédito de vivienda. Se eliminaron "TarjetaCredito.depositar", "CreditoVivienda.depositar" y "CreditoVivienda.retirar", cuyos cuerpos estaban vacíos. "Cuenta" implementa su extracto y "Main" utiliza el generador común con los mismos productos de antes.
