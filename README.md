@@ -136,17 +136,7 @@ El servicio creaba directamente "OracleRepositorio" y "SmsGateway", por lo que n
 
 ## Bloque 4 — Negocio pidió cambios
 
-Antes de programar cada requerimiento se revisó el código del commit "bloque-0-codigo-base" para estimar cuántos archivos existentes habría que modificar allí. Luego se implementó sobre el código refactorizado. Los conteos de la tabla incluyen código de producción y pruebas; no incluyen este README.
-
-| Req. | Archivos a modificar en el código original (estimado) | Archivos existentes modificados (real) | Archivos nuevos | ¿Se rompió alguna prueba? |
-|---|---|---|---|---|
-| R1 | 1: "TransaccionService.java" (nuevo "case" en el "switch") | 1: "Main.java" | 2: "ComisionLlave.java", "TransferenciaLlaveTest.java" | No |
-| R2 | 0: una clase nueva que herede de "Cuenta" y sobrescriba "retirar" | 0 | 2: "CuentaInfantil.java", "CuentaInfantilTest.java" | No |
-| R3 | 1: "TransaccionService.java" (crear "PushGateway" con "new" y llamarlo), más el archivo nuevo del gateway | 1: "Main.java" | 4: "PushGateway.java", "CanalNotificacionCompuesto.java", "NotificacionPushTest.java", "SalidaConsola.java" | No |
-| R4 | 1: "TransaccionService.java" (nueva llamada después de la auditoría) | 1: "Main.java" | 3: "SistemaAntifraude.java", "AuditoriaCompuesta.java", "AntifraudeTest.java" | No |
-| R5 | 1: "TransaccionService.java" (reemplazar "new OracleRepositorio()"), más el archivo nuevo de PostgreSQL | 1: "Main.java" | 1: "PostgresRepositorio.java" | No |
-
-Al terminar los cinco requerimientos se ejecutan 13 pruebas: las 5 del bloque 3, sin cambios, y 8 nuevas. Todas pasan.
+Antes de programar cada requerimiento se revisó el código del commit "bloque-0-codigo-base" para estimar cuántos archivos existentes habría que modificar allí. Luego se implementó sobre el código refactorizado. Los conteos de la tabla del final de esta sección incluyen código de producción y pruebas; no incluyen este README.
 
 ### R1 — Transferencias por llave
 
@@ -182,8 +172,43 @@ Análisis honesto: el antifraude reutiliza la interfaz "AuditoriaTransferencia",
 
 "PostgresRepositorio" implementa "RepositorioTransacciones" e imprime los mensajes "[POSTGRES]". "Main" lo usa en lugar de "OracleRepositorio", que se conserva sin cambios por si hay que devolverse. Las pruebas no cambiaron porque usan "RepositorioEnMemoria" y nunca conocieron Oracle.
 
-### Comparación
+### Tabla del bloque 4
+
+| Req. | Archivos a modificar en el código original (estimado) | Archivos existentes modificados (real) | Archivos nuevos | ¿Se rompió alguna prueba? |
+|---|---|---|---|---|
+| R1 | 1: "TransaccionService.java" (nuevo "case" en el "switch") | 1: "Main.java" | 2: "ComisionLlave.java", "TransferenciaLlaveTest.java" | No |
+| R2 | 0: una clase nueva que herede de "Cuenta" y sobrescriba "retirar" | 0 | 2: "CuentaInfantil.java", "CuentaInfantilTest.java" | No |
+| R3 | 1: "TransaccionService.java" (crear "PushGateway" con "new" y llamarlo), más el archivo nuevo del gateway | 1: "Main.java" | 4: "PushGateway.java", "CanalNotificacionCompuesto.java", "NotificacionPushTest.java", "SalidaConsola.java" | No |
+| R4 | 1: "TransaccionService.java" (nueva llamada después de la auditoría) | 1: "Main.java" | 3: "SistemaAntifraude.java", "AuditoriaCompuesta.java", "AntifraudeTest.java" | No |
+| R5 | 1: "TransaccionService.java" (reemplazar "new OracleRepositorio()"), más el archivo nuevo de PostgreSQL | 1: "Main.java" | 1: "PostgresRepositorio.java" | No |
+
+Al terminar los cinco requerimientos se ejecutan 13 pruebas: las 5 del bloque 3, sin cambios, y 8 nuevas. Todas pasan.
+
+### Análisis
 
 En el código original, R1, R3, R4 y R5 caen en "TransaccionService", la clase que mueve el dinero y que no se podía probar sin Oracle ni SMS. En el código refactorizado, el único archivo existente que cambió fue "Main.java", el punto donde se arma el sistema; la lógica de transferencia no se tocó en ningún requerimiento. El número de archivos modificados es parecido (4 en ambos casos), pero el riesgo no: un error al editar "Main" afecta la configuración, mientras que un error al editar "transferir" puede cobrar mal una transferencia. Además, cada requerimiento quedó con pruebas propias que corren sin infraestructura.
 
+### Salida del programa después del bloque 4
+
 La salida del programa principal cambió a propósito: ahora guarda en PostgreSQL, notifica por SMS y push, y reporta al antifraude después de la auditoría. El resto de la salida es la misma de "salida_original.txt".
+
+```text
+[POSTGRES] Conectando a jdbc:postgresql://prod-db:5432/banco...
+[POSTGRES] INSERT INTO transacciones VALUES ('001-1', '001-2', 150000.0, 7500.0)
+===== BANCO ANDINO - COMPROBANTE =====
+Origen: 001-1
+Destino: 001-2
+Monto:    $150000.0
+Comisión: $7500.0
+======================================
+[SMS] Conectando al proveedor de mensajería...
+[SMS] Para Ana: Transferiste $150000.0 a la cuenta 001-2
+[PUSH] Conectando al servicio de notificaciones de la app...
+[PUSH] Para Ana: Transferiste $150000.0 a la cuenta 001-2
+[AUDITORIA] 2026-10-04T13:18:09.161119436 OTRO_BANCO 001-1 -> 001-2 $150000.0
+[ANTIFRAUDE] Reportando transacción OTRO_BANCO 001-1 -> 001-2 $150000.0
+Cuota de manejo cobrada a 001-1
+Cuota de manejo cobrada a 001-2
+Tarjeta - deuda: $0.0
+Crédito vivienda - pendiente: $1.2E8
+```
