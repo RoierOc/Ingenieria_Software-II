@@ -37,3 +37,21 @@ La prueba de la comisión. Una prueba temporal llamó a "transferir" por $150.00
 Las relaciones problemáticas de herencia, implementación y dependencia están marcadas en rojo. La dependencia de "TransaccionService" hacia "Cuenta" conserva el color normal.
 
 ![UML del código original con relaciones problemáticas en rojo](docs/uml-original.svg)
+
+## Bloque 2 — Refactorización
+
+### Punto de control S
+
+Después del cambio, describan en una frase qué hace "TransaccionService".
+
+"TransaccionService" coordina la ejecución de una transferencia.
+
+¿Aparece la palabra "y"?
+
+No se enumeran responsabilidades adicionales: la responsabilidad del servicio es coordinar la transferencia.
+
+La validación del monto queda en "ValidadorTransferencia", la comisión en "CalculadoraComision", el comprobante en "GeneradorComprobante", el mensaje de notificación en "NotificadorTransferencia" y la auditoría en "RegistroAuditoria". El servicio conserva el orden de ejecución de estas operaciones.
+
+Si el área legal pide cambiar el formato del comprobante, ¿qué archivo tocan?
+
+"GeneradorComprobante.java", que contiene la presentación del comprobante.
