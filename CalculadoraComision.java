@@ -1,10 +1,17 @@
+import java.util.Map;
+
 public class CalculadoraComision {
+    private final Map<String, PoliticaComision> politicas;
+
+    public CalculadoraComision(Map<String, PoliticaComision> politicas) {
+        this.politicas = Map.copyOf(politicas);
+    }
+
     public double calcular(double monto, String tipo) {
-        return switch (tipo) {
-            case "MISMO_BANCO" -> 0;
-            case "OTRO_BANCO" -> 7_500;
-            case "INTERNACIONAL" -> monto * 0.03 + 25_000;
-            default -> throw new IllegalArgumentException("Tipo de transferencia desconocido");
-        };
+        PoliticaComision politica = politicas.get(tipo);
+        if (politica == null) {
+            throw new IllegalArgumentException("Tipo de transferencia desconocido");
+        }
+        return politica.calcular(monto);
     }
 }

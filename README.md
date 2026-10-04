@@ -55,3 +55,11 @@ La validación del monto queda en "ValidadorTransferencia", la comisión en "Cal
 Si el área legal pide cambiar el formato del comprobante, ¿qué archivo tocan?
 
 "GeneradorComprobante.java", que contiene la presentación del comprobante.
+
+### Punto de control O
+
+Si mañana llega un tipo de transferencia nuevo, ¿qué archivos existentes tendrían que modificar? Enumérenlos.
+
+1. "Main.java": registrar la nueva política con el nombre del tipo de transferencia.
+
+Se añade una clase que implemente "PoliticaComision" para definir la comisión nueva. "CalculadoraComision" consulta las políticas registradas y delega el cálculo; ya no contiene el "switch". "TransaccionService" recibe la calculadora configurada desde "Main".
