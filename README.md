@@ -107,3 +107,29 @@ Vuelvan al experimento 2 del bloque 1: ¿ya es posible esa prueba?
 Sí. Se sustituyeron el repositorio y el canal de notificación por dobles en memoria, y el comprobante y la auditoría por implementaciones silenciosas. La prueba verificó una comisión de $7.500, los saldos finales, los datos registrados y el mensaje, sin crear Oracle ni el proveedor SMS. También comprobó que un monto inválido no genera registros ni mensajes.
 
 Se definieron contratos pequeños para validación, cálculo de comisión, persistencia, comprobante, notificación, auditoría, canal de mensajes y operaciones de cuenta. Las implementaciones existentes cumplen esos contratos y "Main" conecta todas las dependencias.
+
+## Bloque 3 — Pruebas unitarias
+
+Se configuraron JUnit y Maven Wrapper. Las pruebas están en "src/test/java" y utilizan cuentas, validación y políticas de comisión reales. "RepositorioEnMemoria" guarda los registros y "NotificadorEnMemoria" conserva las notificaciones; el comprobante y la auditoría utilizan implementaciones silenciosas.
+
+Las cinco pruebas cubren:
+
+1. Transferencia al mismo banco sin comisión y con movimiento exacto del monto.
+2. Transferencia a otro banco con comisión de $7.500 descontada del origen.
+3. Saldo insuficiente sin registros, notificaciones ni cambios de saldo.
+4. Una transferencia exitosa con un registro y una notificación.
+5. Tipo desconocido rechazado sin cambios de saldo ni efectos externos.
+
+¿Cuánto tardan en ejecutarse todas sus pruebas?
+
+Las cinco pruebas tardaron 58 ms según el reporte de Maven Surefire de la ejecución en Windows mostrada abajo. Es el tiempo de ejecución de las pruebas; no incluye las descargas, la compilación ni el arranque de Maven.
+
+¿Cuántas líneas de "TransaccionService" tuvieron que cambiar para poder probarla?
+
+Cero. El constructor y las interfaces del control D permiten sustituir sus dependencias por dobles.
+
+¿Qué habría pasado si intentaran estas mismas pruebas en el bloque 1?
+
+El servicio creaba directamente "OracleRepositorio" y "SmsGateway", por lo que no se podían sustituir por dobles. Bajo el supuesto de conexiones reales de la guía, las pruebas accederían a la base de producción y enviarían mensajes al cliente.
+
+![Evidencia de las cinco pruebas ejecutadas en Windows](tests.png)
