@@ -1,5 +1,5 @@
-public class GeneradorComprobante {
-    public void generar(Cuenta origen, Cuenta destino, double monto, double comision) {
+public class GeneradorComprobante implements ComprobanteTransferencia {
+    public void generar(CuentaTransaccional origen, CuentaTransaccional destino, double monto, double comision) {
         System.out.println("===== BANCO ANDINO - COMPROBANTE =====");
         System.out.println("Origen: " + origen.getNumero());
         System.out.println("Destino: " + destino.getNumero());

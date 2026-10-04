@@ -1,6 +1,6 @@
 import java.util.Map;
 
-public class CalculadoraComision {
+public class CalculadoraComision implements CalculoComision {
     private final Map<String, PoliticaComision> politicas;
 
     public CalculadoraComision(Map<String, PoliticaComision> politicas) {

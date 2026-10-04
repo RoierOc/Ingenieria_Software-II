@@ -91,3 +91,19 @@ Sí. "GeneradorExtractos" puede imprimir una lista que contenga "CuentaAhorros",
 "ProductoBancario", reducida al método "generarExtracto". El generador solo necesita obtener e imprimir ese texto; no utiliza depósitos, retiros, intereses ni pagos.
 
 Los métodos "calcularIntereses" y "pagarCuota" se agruparon en "ProductoCredito", implementada por la tarjeta y el crédito de vivienda. Se eliminaron "TarjetaCredito.depositar", "CreditoVivienda.depositar" y "CreditoVivienda.retirar", cuyos cuerpos estaban vacíos. "Cuenta" implementa su extracto y "Main" utiliza el generador común con los mismos productos de antes.
+
+### Punto de control D
+
+¿Cuántas clases concretas conoce ahora "TransaccionService"?
+
+Ninguna implementación concreta de la aplicación. Sus seis colaboradores y las cuentas se utilizan mediante interfaces. El servicio recibe los colaboradores por constructor y no crea dependencias con "new".
+
+¿Quién decide si se usa Oracle o si se notifica por SMS?
+
+"Main.java", donde se arma el sistema: selecciona "OracleRepositorio" y entrega un "SmsGateway" a "NotificadorTransferencia". El notificador recibe "CanalNotificacion" y tampoco crea su proveedor.
+
+Vuelvan al experimento 2 del bloque 1: ¿ya es posible esa prueba?
+
+Sí. Se sustituyeron el repositorio y el canal de notificación por dobles en memoria, y el comprobante y la auditoría por implementaciones silenciosas. La prueba verificó una comisión de $7.500, los saldos finales, los datos registrados y el mensaje, sin crear Oracle ni el proveedor SMS. También comprobó que un monto inválido no genera registros ni mensajes.
+
+Se definieron contratos pequeños para validación, cálculo de comisión, persistencia, comprobante, notificación, auditoría, canal de mensajes y operaciones de cuenta. Las implementaciones existentes cumplen esos contratos y "Main" conecta todas las dependencias.

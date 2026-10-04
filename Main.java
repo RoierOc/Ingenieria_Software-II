@@ -13,7 +13,11 @@ public class Main {
             "OTRO_BANCO", new ComisionOtroBanco(),
             "INTERNACIONAL", new ComisionInternacional()
         ));
-        TransaccionService servicio = new TransaccionService(calculadora);
+        TransaccionService servicio = new TransaccionService(
+            new ValidadorTransferencia(), calculadora, new OracleRepositorio(),
+            new GeneradorComprobante(), new NotificadorTransferencia(new SmsGateway()),
+            new RegistroAuditoria()
+        );
         servicio.transferir(ana, luis, 150_000, "OTRO_BANCO");
 
         new CobroCuotaManejo().cobrarMensual(List.of(ana, luis));

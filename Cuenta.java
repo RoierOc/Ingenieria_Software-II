@@ -1,4 +1,4 @@
-public class Cuenta extends ProductoConSaldo implements ProductoBancario {
+public class Cuenta extends ProductoConSaldo implements ProductoBancario, CuentaTransaccional {
     public Cuenta(String numero, String titular, double saldoInicial) {
         super(numero, titular, saldoInicial);
     }
