@@ -16,7 +16,9 @@ public class Main {
         ));
         TransaccionService servicio = new TransaccionService(
             new ValidadorTransferencia(), calculadora, new OracleRepositorio(),
-            new GeneradorComprobante(), new NotificadorTransferencia(new SmsGateway()),
+            new GeneradorComprobante(),
+            new NotificadorTransferencia(new CanalNotificacionCompuesto(
+                List.of(new SmsGateway(), new PushGateway()))),
             new RegistroAuditoria()
         );
         servicio.transferir(ana, luis, 150_000, "OTRO_BANCO");
