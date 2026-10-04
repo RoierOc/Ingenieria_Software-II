@@ -1,0 +1,86 @@
+classDiagram
+direction TB
+
+class Cuenta {
+  #String numero
+  #String titular
+  #double saldo
+  +depositar()
+  +retirar()
+}
+class CuentaAhorros {
+  +CuentaAhorros()
+}
+class CDT {
+  -LocalDate vencimiento
+  +CDT()
+  +retirar()
+}
+class CobroCuotaManejo {
+  -double CUOTA
+  +cobrarMensual()
+}
+class TransaccionService {
+  -OracleRepositorio repositorio
+  -SmsGateway sms
+  +transferir()
+}
+class OracleRepositorio {
+  +guardarTransaccion()
+}
+class SmsGateway {
+  +enviar()
+}
+class ProductoBancario {
+  <<interface>>
+  +depositar()
+  +retirar()
+  +double calcularIntereses()
+  +pagarCuota()
+  +String generarExtracto()
+}
+class TarjetaCredito {
+  -double deuda
+  -double cupo
+  +depositar()
+  +retirar()
+  +double calcularIntereses()
+  +pagarCuota()
+  +String generarExtracto()
+}
+class CreditoVivienda {
+  -double saldoPendiente
+  +depositar()
+  +retirar()
+  +double calcularIntereses()
+  +pagarCuota()
+  +String generarExtracto()
+}
+class Main {
+  +main()
+}
+
+Cuenta <|-- CuentaAhorros
+Cuenta <|-- CDT : LSP
+ProductoBancario <|.. TarjetaCredito
+ProductoBancario <|.. CreditoVivienda
+CobroCuotaManejo ..> Cuenta : usa cuentas
+TransaccionService ..> Cuenta : usa cuentas
+TransaccionService ..> OracleRepositorio : new (DIP)
+TransaccionService ..> SmsGateway : new (DIP)
+Main ..> CuentaAhorros : new
+Main ..> CDT : new
+Main ..> TransaccionService : new
+Main ..> CobroCuotaManejo : new
+Main ..> TarjetaCredito : new
+Main ..> CreditoVivienda : new
+Main ..> ProductoBancario : List~ProductoBancario~
+
+style CDT fill:#ffeded,stroke:#c00,color:#600
+style CobroCuotaManejo fill:#ffeded,stroke:#c00,color:#600
+style TransaccionService fill:#ffeded,stroke:#c00,color:#600
+style OracleRepositorio fill:#ffeded,stroke:#c00,color:#600
+style SmsGateway fill:#ffeded,stroke:#c00,color:#600
+style ProductoBancario fill:#ffeded,stroke:#c00,color:#600
+style TarjetaCredito fill:#ffeded,stroke:#c00,color:#600
+style CreditoVivienda fill:#ffeded,stroke:#c00,color:#600

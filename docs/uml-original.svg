@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="930" height="1770" viewBox="0 0 930 1770" role="img" aria-labelledby="title"><title id="title">UML original: relaciones problemáticas en rojo</title><rect width="930" height="1770" fill="white"/><defs>
+<marker id="dep-normal" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#333" stroke-width="1.5"/></marker><marker id="inherit-normal" markerWidth="14" markerHeight="14" refX="13" refY="7" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1 L13 7 L1 13 Z" fill="white" stroke="#333" stroke-width="1.5"/></marker>
+<marker id="dep-red" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#c00" stroke-width="1.5"/></marker><marker id="inherit-red" markerWidth="14" markerHeight="14" refX="13" refY="7" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1 L13 7 L1 13 Z" fill="white" stroke="#c00" stroke-width="1.5"/></marker>
+</defs><g font-family="Arial, sans-serif" font-size="14">
+<polyline points="370,100 370,135 215,135 215,180" fill="none" stroke="#333" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#dep-normal)"/>
+<rect x="273.5" y="121" width="33" height="19" fill="white"/><text x="290" y="135" text-anchor="middle" fill="#333">new</text>
+<polyline points="560,100 560,145 655,145 655,180" fill="none" stroke="#333" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#dep-normal)"/>
+<rect x="593.5" y="131" width="33" height="19" fill="white"/><text x="610" y="145" text-anchor="middle" fill="#333">new</text>
+<polyline points="290,65 15,65 15,1530 40,1530" fill="none" stroke="#333" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#dep-normal)"/>
+<rect x="10.5" y="1496" width="33" height="19" fill="white"/><text x="27" y="1510" text-anchor="middle" fill="#333">new</text>
+<polyline points="640,65 915,65 915,1540 830,1540" fill="none" stroke="#333" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#dep-normal)"/>
+<rect x="860.5" y="1506" width="33" height="19" fill="white"/><text x="877" y="1520" text-anchor="middle" fill="#333">new</text>
+<polyline points="290,80 25,80 25,1210 40,1210" fill="none" stroke="#333" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#dep-normal)"/>
+<rect x="30.0" y="1176" width="40" height="19" fill="white"/><text x="50" y="1190" text-anchor="middle" fill="#333">List</text>
+<polyline points="640,45 870,45 870,690 830,690" fill="none" stroke="#333" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#dep-normal)"/>
+<rect x="839.5" y="656" width="33" height="19" fill="white"/><text x="856" y="670" text-anchor="middle" fill="#333">new</text>
+<polyline points="640,80 890,80 890,945 830,945" fill="none" stroke="#333" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#dep-normal)"/>
+<rect x="847.5" y="911" width="33" height="19" fill="white"/><text x="864" y="925" text-anchor="middle" fill="#333">new</text>
+<polyline points="215,310 215,410" fill="none" stroke="#c00" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#dep-red)"/>
+<rect x="177.5" y="346" width="75" height="19" fill="white"/><text x="215" y="360" text-anchor="middle" fill="#c00">new (DIP)</text>
+<polyline points="390,250 445,250 445,375 655,375 655,410" fill="none" stroke="#c00" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#dep-red)"/>
+<rect x="512.5" y="361" width="75" height="19" fill="white"/><text x="550" y="375" text-anchor="middle" fill="#c00">new (DIP)</text>
+<polyline points="40,280 32,280 32,620 150,620 150,650" fill="none" stroke="#333" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#dep-normal)"/>
+<rect x="105.5" y="606" width="89" height="19" fill="white"/><text x="150" y="620" text-anchor="middle" fill="#333">usa cuentas</text>
+<polyline points="480,230 465,230 465,790 390,790" fill="none" stroke="#c00" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#dep-red)"/>
+<rect x="388.5" y="806" width="89" height="19" fill="white"/><text x="433" y="820" text-anchor="middle" fill="#c00">usa cuentas</text>
+<polyline points="480,705 390,705" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#inherit-normal)"/>
+<polyline points="480,980 440,980 440,760 390,760" fill="none" stroke="#c00" stroke-width="1.8" marker-end="url(#inherit-red)"/>
+<rect x="423.5" y="886" width="33" height="19" fill="white"/><text x="440" y="900" text-anchor="middle" fill="#c00">LSP</text>
+<polyline points="215,1480 215,1353" fill="none" stroke="#c00" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#inherit-red)"/>
+<rect x="198.5" y="1421" width="33" height="19" fill="white"/><text x="215" y="1435" text-anchor="middle" fill="#c00">ISP</text>
+<polyline points="655,1480 655,1435 340,1435 340,1353" fill="none" stroke="#c00" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#inherit-red)"/>
+<rect x="518.5" y="1421" width="33" height="19" fill="white"/><text x="535" y="1435" text-anchor="middle" fill="#c00">ISP</text>
+<g data-class="Main"><rect x="290" y="20" width="350" height="89" rx="2" fill="#f8fafc" stroke="#333" stroke-width="1.5"/>
+<text x="465" y="44" font-weight="bold" text-anchor="middle">Main</text>
+<path d="M290 56 H640" stroke="#333"/>
+<path d="M290 72 H640" stroke="#333"/>
+<text x="302" y="95">+ main()</text>
+</g>
+<g data-class="TransaccionService"><rect x="40" y="180" width="350" height="133" rx="2" fill="#fff3f3" stroke="#c00" stroke-width="1.5"/>
+<text x="215" y="204" font-weight="bold" text-anchor="middle">TransaccionService</text>
+<path d="M40 216 H390" stroke="#c00"/>
+<path d="M40 276 H390" stroke="#c00"/>
+<text x="52" y="239">- OracleRepositorio repositorio</text>
+<text x="52" y="262">- SmsGateway sms</text>
+<text x="52" y="299">+ transferir()</text>
+</g>
+<g data-class="CobroCuotaManejo"><rect x="480" y="180" width="350" height="110" rx="2" fill="#fff3f3" stroke="#c00" stroke-width="1.5"/>
+<text x="655" y="204" font-weight="bold" text-anchor="middle">CobroCuotaManejo</text>
+<path d="M480 216 H830" stroke="#c00"/>
+<path d="M480 253 H830" stroke="#c00"/>
+<text x="492" y="239">- double CUOTA</text>
+<text x="492" y="276">+ cobrarMensual()</text>
+</g>
+<g data-class="OracleRepositorio"><rect x="40" y="410" width="350" height="89" rx="2" fill="#fff3f3" stroke="#c00" stroke-width="1.5"/>
+<text x="215" y="434" font-weight="bold" text-anchor="middle">OracleRepositorio</text>
+<path d="M40 446 H390" stroke="#c00"/>
+<path d="M40 462 H390" stroke="#c00"/>
+<text x="52" y="485">+ guardarTransaccion()</text>
+</g>
+<g data-class="SmsGateway"><rect x="480" y="410" width="350" height="89" rx="2" fill="#fff3f3" stroke="#c00" stroke-width="1.5"/>
+<text x="655" y="434" font-weight="bold" text-anchor="middle">SmsGateway</text>
+<path d="M480 446 H830" stroke="#c00"/>
+<path d="M480 462 H830" stroke="#c00"/>
+<text x="492" y="485">+ enviar()</text>
+</g>
+<g data-class="Cuenta"><rect x="40" y="650" width="350" height="179" rx="2" fill="#f8fafc" stroke="#333" stroke-width="1.5"/>
+<text x="215" y="674" font-weight="bold" text-anchor="middle">Cuenta</text>
+<path d="M40 686 H390" stroke="#333"/>
+<path d="M40 769 H390" stroke="#333"/>
+<text x="52" y="709"># String numero</text>
+<text x="52" y="732"># String titular</text>
+<text x="52" y="755"># double saldo</text>
+<text x="52" y="792">+ depositar()</text>
+<text x="52" y="815">+ retirar()</text>
+</g>
+<g data-class="CuentaAhorros"><rect x="480" y="650" width="350" height="89" rx="2" fill="#f8fafc" stroke="#333" stroke-width="1.5"/>
+<text x="655" y="674" font-weight="bold" text-anchor="middle">CuentaAhorros</text>
+<path d="M480 686 H830" stroke="#333"/>
+<path d="M480 702 H830" stroke="#333"/>
+<text x="492" y="725">+ CuentaAhorros()</text>
+</g>
+<g data-class="CDT"><rect x="480" y="900" width="350" height="133" rx="2" fill="#fff3f3" stroke="#c00" stroke-width="1.5"/>
+<text x="655" y="924" font-weight="bold" text-anchor="middle">CDT</text>
+<path d="M480 936 H830" stroke="#c00"/>
+<path d="M480 973 H830" stroke="#c00"/>
+<text x="492" y="959">- LocalDate vencimiento</text>
+<text x="492" y="996">+ CDT()</text>
+<text x="492" y="1019">+ retirar()</text>
+</g>
+<g data-class="ProductoBancario"><rect x="40" y="1160" width="350" height="193" rx="2" fill="#fff3f3" stroke="#c00" stroke-width="1.5"/>
+<text x="215" y="1177" text-anchor="middle">«interface»</text>
+<text x="215" y="1196" font-weight="bold" text-anchor="middle">ProductoBancario</text>
+<path d="M40 1208 H390" stroke="#c00"/>
+<path d="M40 1224 H390" stroke="#c00"/>
+<text x="52" y="1247">+ depositar()</text>
+<text x="52" y="1270">+ retirar()</text>
+<text x="52" y="1293">+ double calcularIntereses()</text>
+<text x="52" y="1316">+ pagarCuota()</text>
+<text x="52" y="1339">+ String generarExtracto()</text>
+</g>
+<g data-class="TarjetaCredito"><rect x="40" y="1480" width="350" height="225" rx="2" fill="#fff3f3" stroke="#c00" stroke-width="1.5"/>
+<text x="215" y="1504" font-weight="bold" text-anchor="middle">TarjetaCredito</text>
+<path d="M40 1516 H390" stroke="#c00"/>
+<path d="M40 1576 H390" stroke="#c00"/>
+<text x="52" y="1539">- double deuda</text>
+<text x="52" y="1562">- double cupo</text>
+<text x="52" y="1599">+ depositar()</text>
+<text x="52" y="1622">+ retirar()</text>
+<text x="52" y="1645">+ double calcularIntereses()</text>
+<text x="52" y="1668">+ pagarCuota()</text>
+<text x="52" y="1691">+ String generarExtracto()</text>
+</g>
+<g data-class="CreditoVivienda"><rect x="480" y="1480" width="350" height="202" rx="2" fill="#fff3f3" stroke="#c00" stroke-width="1.5"/>
+<text x="655" y="1504" font-weight="bold" text-anchor="middle">CreditoVivienda</text>
+<path d="M480 1516 H830" stroke="#c00"/>
+<path d="M480 1553 H830" stroke="#c00"/>
+<text x="492" y="1539">- double saldoPendiente</text>
+<text x="492" y="1576">+ depositar()</text>
+<text x="492" y="1599">+ retirar()</text>
+<text x="492" y="1622">+ double calcularIntereses()</text>
+<text x="492" y="1645">+ pagarCuota()</text>
+<text x="492" y="1668">+ String generarExtracto()</text>
+</g>
+</g></svg>

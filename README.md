@@ -1,0 +1,39 @@
+# Laboratorio L2: SOLID
+
+- Lenguaje: Java 21
+- Proyecto: Backend de Banco Andino
+- Base: código original del laboratorio, conservado para el diagnóstico.
+
+## Bloque 1 — Diagnóstico
+
+### 1.1 Tabla de hallazgos
+
+| Clase / método | Letra | Evidencia en el código | Consecuencia para el banco o el cliente |
+|---|---|---|---|
+| "TransaccionService.transferir" ("TransaccionService.java", líneas 7–42) | S | Valida, calcula comisión, mueve dinero, persiste, imprime el comprobante, notifica y audita. | Un cambio de formato del comprobante obliga a editar la clase que mueve el dinero; un error de presentación puede afectar una operación financiera. |
+| "TransaccionService.transferir" ("TransaccionService.java", líneas 14–18) | O | El "switch" selecciona la comisión según "tipo". | Agregar un tipo de transferencia exige editar el servicio y puede alterar por accidente una comisión existente. |
+| "CDT.retirar" ("CDT.java", líneas 11–18) y "CobroCuotaManejo.cobrarMensual" ("CobroCuotaManejo.java", líneas 6–10) | L | "CDT" hereda de "Cuenta", pero rechaza "retirar" antes del vencimiento; el cobro acepta cualquier "Cuenta". | El proceso mensual puede detenerse al encontrar un CDT. Las cuentas procesadas antes ya fueron cobradas y las siguientes quedan pendientes. |
+| "ProductoBancario.java", líneas 1–6, y sus implementaciones | I | La interfaz exige "depositar" y "retirar"; "TarjetaCredito" y "CreditoVivienda" dejan métodos vacíos porque no aplican. | Un cliente puede invocar una operación que el producto no admite y recibir una respuesta silenciosa, sin saber que no ocurrió nada. |
+| "TransaccionService.java", líneas 4–5 | D | Construye "OracleRepositorio" y "SmsGateway" con "new". | El servicio queda acoplado a esas clases y no permite sustituirlas por dobles sin modificarlo, lo que dificulta aislar pruebas y cambiar proveedores. |
+
+### 1.2 Experimentos
+
+El CDT. Se incluyó temporalmente el CDT de Ana en la lista de "cobrarMensual". La ejecución cobró primero a Ana y Luis y luego lanzó "UnsupportedOperationException" al intentar retirar del CDT antes de su vencimiento. El saldo del CDT no cambió. El lote no continuó ni revirtió los cobros anteriores. Si el CDT fuera la cuenta número 500.000, las 499.999 anteriores quedarían cobradas y el resto del millón no se procesaría.
+
+La prueba de la comisión. Una prueba temporal llamó a "transferir" por $150.000 a otro banco, capturó la salida y comprobó la comisión de $7.500 y los saldos finales. Si las conexiones fueran reales, la respuesta es no: "TransaccionService" crea directamente esas dependencias y no permite sustituirlas por dobles. Nota: esta ejecución no accedió a Oracle ni envió SMS porque, en este código base, "OracleRepositorio" y "SmsGateway" solo imprimen en consola. La prueba tuvo que capturar la salida para observar la comisión, pues "transferir" no la devuelve.
+
+### 1.3 Medición “antes”
+
+| Métrica | Antes |
+|---|---:|
+| Líneas del método "transferir" | 36 (líneas 7–42, contando comentarios y líneas vacías) |
+| Razones distintas por las que "TransaccionService" podría cambiar | 7: validación, comisión, movimiento, persistencia, comprobante, notificación y auditoría |
+| Clases concretas que "TransaccionService" crea con "new" | 2: "OracleRepositorio" y "SmsGateway" |
+| Métodos vacíos por “no aplica” | 3: "TarjetaCredito.depositar", "CreditoVivienda.depositar" y "CreditoVivienda.retirar"; "CDT.retirar" también puede lanzar "UnsupportedOperationException", pero por una restricción temporal de negocio |
+| ¿Se puede probar sin conexión a Oracle ni envío de SMS? | No: el servicio crea directamente esas dependencias y no permite sustituirlas por dobles. Nota: en esta simulación, ambas clases solo imprimen. |
+
+### 1.4 Diagrama UML del código original
+
+Las relaciones problemáticas de herencia, implementación y dependencia están marcadas en rojo. La dependencia de "TransaccionService" hacia "Cuenta" conserva el color normal.
+
+![UML del código original con relaciones problemáticas en rojo](docs/uml-original.svg)
