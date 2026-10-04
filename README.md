@@ -133,3 +133,57 @@ Cero. El constructor y las interfaces del control D permiten sustituir sus depen
 El servicio creaba directamente "OracleRepositorio" y "SmsGateway", por lo que no se podían sustituir por dobles. Bajo el supuesto de conexiones reales de la guía, las pruebas accederían a la base de producción y enviarían mensajes al cliente.
 
 ![Evidencia de las cinco pruebas ejecutadas en Windows](tests.png)
+
+## Bloque 4 — Negocio pidió cambios
+
+Antes de programar cada requerimiento se revisó el código del commit "bloque-0-codigo-base" para estimar cuántos archivos existentes habría que modificar allí. Luego se implementó sobre el código refactorizado. Los conteos de la tabla incluyen código de producción y pruebas; no incluyen este README.
+
+| Req. | Archivos a modificar en el código original (estimado) | Archivos existentes modificados (real) | Archivos nuevos | ¿Se rompió alguna prueba? |
+|---|---|---|---|---|
+| R1 | 1: "TransaccionService.java" (nuevo "case" en el "switch") | 1: "Main.java" | 2: "ComisionLlave.java", "TransferenciaLlaveTest.java" | No |
+| R2 | 0: una clase nueva que herede de "Cuenta" y sobrescriba "retirar" | 0 | 2: "CuentaInfantil.java", "CuentaInfantilTest.java" | No |
+| R3 | 1: "TransaccionService.java" (crear "PushGateway" con "new" y llamarlo), más el archivo nuevo del gateway | 1: "Main.java" | 4: "PushGateway.java", "CanalNotificacionCompuesto.java", "NotificacionPushTest.java", "SalidaConsola.java" | No |
+| R4 | 1: "TransaccionService.java" (nueva llamada después de la auditoría) | 1: "Main.java" | 3: "SistemaAntifraude.java", "AuditoriaCompuesta.java", "AntifraudeTest.java" | No |
+| R5 | 1: "TransaccionService.java" (reemplazar "new OracleRepositorio()"), más el archivo nuevo de PostgreSQL | 1: "Main.java" | 1: "PostgresRepositorio.java" | No |
+
+Al terminar los cinco requerimientos se ejecutan 13 pruebas: las 5 del bloque 3, sin cambios, y 8 nuevas. Todas pasan.
+
+### R1 — Transferencias por llave
+
+"ComisionLlave" implementa "PoliticaComision" y devuelve 0. "Main" la registra con el tipo "LLAVE". "TransaccionService" y "CalculadoraComision" no cambiaron: es exactamente el escenario del punto de control O. La búsqueda de la cuenta a partir de la llave no se implementó, como indica el enunciado.
+
+Criterio de aceptación: "TransferenciaLlaveTest" transfiere $50.000 por llave y verifica que el origen pasa de $1.000.000 a $950.000 y que la comisión guardada es 0.
+
+### R2 — Cuenta infantil
+
+"CuentaInfantil" hereda de "Cuenta" y sobrescribe "retirar": lleva el acumulado retirado en el día y rechaza con "IllegalStateException" el retiro que haga superar $200.000, antes de tocar el saldo. El acumulado se reinicia al cambiar de fecha. La fecha se obtiene de un "Clock" que se puede inyectar en las pruebas. Los depósitos se heredan sin límite.
+
+Como es una "Cuenta", funciona sin cambios como origen en "TransaccionService" (que recibe "CuentaTransaccional") y en "CobroCuotaManejo" (que recibe "List<Cuenta>"). Por eso no se modificó ningún archivo existente.
+
+Criterio de aceptación: "CuentaInfantilTest" retira $150.000, intenta retirar $60.000, recibe el rechazo y comprueba que el saldo sigue en $850.000. Otras pruebas cubren el reinicio al día siguiente, los depósitos sin límite, la transferencia desde la cuenta infantil y el cobro de la cuota.
+
+Análisis honesto: "CuentaInfantil" agrega una condición al retiro que "Cuenta" no tiene. Usa la misma excepción que "Saldo insuficiente", así que quien ya maneja ese rechazo no se rompe. Aun así, el diseño no aguantó del todo bien en un punto: "CobroCuotaManejo" cobra con "retirar", de modo que la cuota de manejo cuenta para el límite diario. Si el menor ya retiró $200.000 ese día, el cobro de su cuota se rechaza y el lote se detiene, igual que con una cuenta sin saldo. La comisión de una transferencia también cuenta para el límite. Propuesta: separar el cargo que hace el banco (cuota) del retiro que hace el cliente, por ejemplo con un método de débito propio para cargos en "Cuenta", y hacer que el cobro mensual registre los rechazos en vez de detenerse.
+
+### R3 — Notificaciones push
+
+"PushGateway" implementa "CanalNotificacion" e imprime los mensajes "[PUSH]". "CanalNotificacionCompuesto" también implementa "CanalNotificacion" y reenvía el mensaje a cada canal de su lista. "Main" entrega a "NotificadorTransferencia" un compuesto con "SmsGateway" y "PushGateway". El texto del mensaje sigue en un solo lugar ("NotificadorTransferencia"), y "TransaccionService" sigue llamando una sola vez al notificador, por lo que la prueba 4 del bloque 3 no cambió.
+
+Criterio de aceptación: "NotificacionPushTest" arma el servicio con los dos canales reales, captura la consola y verifica un mensaje "[SMS]" y uno "[PUSH]" para la transferencia. "SalidaConsola" es una utilidad de prueba para capturar la consola; se reutiliza en R4.
+
+### R4 — Sistema antifraude
+
+"SistemaAntifraude" implementa "AuditoriaTransferencia" e imprime el mensaje "[ANTIFRAUDE]". "AuditoriaCompuesta" ejecuta en orden las auditorías de su lista. "Main" entrega una con "RegistroAuditoria" y "SistemaAntifraude". La auditoría actual no cambió. "TransaccionService" registra la auditoría como último paso, así que una transferencia rechazada no llega ni a la auditoría ni al antifraude.
+
+Criterio de aceptación: "AntifraudeTest" verifica un "[AUDITORIA]" y un "[ANTIFRAUDE]" por transferencia exitosa, y ninguno cuando se rechaza por saldo insuficiente.
+
+Análisis honesto: el antifraude reutiliza la interfaz "AuditoriaTransferencia", cuyo nombre es más específico que su papel real: "acción posterior a una transferencia exitosa". Funciona sin modificar el servicio, pero quien lea "Main" puede sorprenderse de ver el antifraude dentro de una "auditoría". Propuesta: renombrar la interfaz a algo como "ObservadorTransferencia". No se hizo para no modificar archivos existentes en este bloque.
+
+### R5 — Migración a PostgreSQL
+
+"PostgresRepositorio" implementa "RepositorioTransacciones" e imprime los mensajes "[POSTGRES]". "Main" lo usa en lugar de "OracleRepositorio", que se conserva sin cambios por si hay que devolverse. Las pruebas no cambiaron porque usan "RepositorioEnMemoria" y nunca conocieron Oracle.
+
+### Comparación
+
+En el código original, R1, R3, R4 y R5 caen en "TransaccionService", la clase que mueve el dinero y que no se podía probar sin Oracle ni SMS. En el código refactorizado, el único archivo existente que cambió fue "Main.java", el punto donde se arma el sistema; la lógica de transferencia no se tocó en ningún requerimiento. El número de archivos modificados es parecido (4 en ambos casos), pero el riesgo no: un error al editar "Main" afecta la configuración, mientras que un error al editar "transferir" puede cobrar mal una transferencia. Además, cada requerimiento quedó con pruebas propias que corren sin infraestructura.
+
+La salida del programa principal cambió a propósito: ahora guarda en PostgreSQL, notifica por SMS y push, y reporta al antifraude después de la auditoría. El resto de la salida es la misma de "salida_original.txt".

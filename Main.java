@@ -15,7 +15,7 @@ public class Main {
             "LLAVE", new ComisionLlave()
         ));
         TransaccionService servicio = new TransaccionService(
-            new ValidadorTransferencia(), calculadora, new OracleRepositorio(),
+            new ValidadorTransferencia(), calculadora, new PostgresRepositorio(),
             new GeneradorComprobante(),
             new NotificadorTransferencia(new CanalNotificacionCompuesto(
                 List.of(new SmsGateway(), new PushGateway()))),
