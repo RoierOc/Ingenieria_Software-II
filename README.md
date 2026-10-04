@@ -63,3 +63,19 @@ Si mañana llega un tipo de transferencia nuevo, ¿qué archivos existentes tend
 1. "Main.java": registrar la nueva política con el nombre del tipo de transferencia.
 
 Se añade una clase que implemente "PoliticaComision" para definir la comisión nueva. "CalculadoraComision" consulta las políticas registradas y delega el cálculo; ya no contiene el "switch". "TransaccionService" recibe la calculadora configurada desde "Main".
+
+### Punto de control L
+
+¿Su solución detecta el error al compilar o al ejecutar?
+
+Al compilar. "CDT" ya no hereda de "Cuenta": ambos comparten "ProductoConSaldo", que ofrece identificación, saldo y depósito, pero no promete retiros libres. "CobroCuotaManejo" acepta una lista de "Cuenta", por lo que incluir un CDT produce un error de tipos.
+
+¿Por qué es mejor lo primero?
+
+La incompatibilidad se detecta antes de ejecutar el proceso de cobro. Se evita que el lote cobre algunas cuentas y falle después al encontrar el CDT.
+
+Si alguien propone envolver el retiro en un try/catch e ignorar los CDT, ¿por qué eso no resuelve el problema de diseño?
+
+Solo oculta el fallo durante la ejecución. El CDT seguiría presentado como una cuenta sustituible aunque no cumpla el contrato de retiro, y otros clientes de esa jerarquía podrían encontrar el mismo problema.
+
+Se extrajo el estado común a "ProductoConSaldo". "Cuenta" conserva el retiro libre sujeto al saldo disponible; "CDT" conserva su restricción de vencimiento. "Main" declara el CDT con su tipo propio.
