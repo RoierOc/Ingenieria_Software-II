@@ -11,7 +11,8 @@ public class Main {
         CalculadoraComision calculadora = new CalculadoraComision(Map.of(
             "MISMO_BANCO", new ComisionMismoBanco(),
             "OTRO_BANCO", new ComisionOtroBanco(),
-            "INTERNACIONAL", new ComisionInternacional()
+            "INTERNACIONAL", new ComisionInternacional(),
+            "LLAVE", new ComisionLlave()
         ));
         TransaccionService servicio = new TransaccionService(
             new ValidadorTransferencia(), calculadora, new OracleRepositorio(),
