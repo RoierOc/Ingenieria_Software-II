@@ -1,0 +1,213 @@
+classDiagram
+direction TB
+
+class TransaccionService {
+  -ValidacionTransferencia validador
+  -CalculoComision calculadora
+  -RepositorioTransacciones repositorio
+  -ComprobanteTransferencia comprobante
+  -NotificacionTransferencia notificador
+  -AuditoriaTransferencia auditoria
+  +transferir()
+}
+
+class ValidacionTransferencia {
+  <<interface>>
+  +validar()
+}
+class ValidadorTransferencia {
+  +validar()
+}
+
+class CalculoComision {
+  <<interface>>
+  +double calcular()
+}
+class CalculadoraComision {
+  -Map~String, PoliticaComision~ politicas
+  +double calcular()
+}
+class PoliticaComision {
+  <<interface>>
+  +double calcular()
+}
+class ComisionMismoBanco
+class ComisionOtroBanco
+class ComisionInternacional
+class ComisionLlave
+
+class RepositorioTransacciones {
+  <<interface>>
+  +guardarTransaccion()
+}
+class OracleRepositorio {
+  +guardarTransaccion()
+}
+class PostgresRepositorio {
+  +guardarTransaccion()
+}
+
+class ComprobanteTransferencia {
+  <<interface>>
+  +generar()
+}
+class GeneradorComprobante {
+  +generar()
+}
+
+class NotificacionTransferencia {
+  <<interface>>
+  +notificar()
+}
+class NotificadorTransferencia {
+  -CanalNotificacion canal
+  +notificar()
+}
+class CanalNotificacion {
+  <<interface>>
+  +enviar()
+}
+class SmsGateway {
+  +enviar()
+}
+class PushGateway {
+  +enviar()
+}
+class CanalNotificacionCompuesto {
+  -List~CanalNotificacion~ canales
+  +enviar()
+}
+
+class AuditoriaTransferencia {
+  <<interface>>
+  +registrar()
+}
+class RegistroAuditoria {
+  +registrar()
+}
+class SistemaAntifraude {
+  +registrar()
+}
+class AuditoriaCompuesta {
+  -List~AuditoriaTransferencia~ auditorias
+  +registrar()
+}
+
+class CuentaTransaccional {
+  <<interface>>
+  +String getNumero()
+  +String getTitular()
+  +depositar()
+  +retirar()
+}
+class ProductoConSaldo {
+  <<abstract>>
+  #String numero
+  #String titular
+  #double saldo
+  +depositar()
+  #descontarSaldo()
+}
+class Cuenta {
+  +retirar()
+  +final cobrarCargo()
+  +String generarExtracto()
+}
+class CuentaAhorros
+class CuentaInfantil {
+  -Clock reloj
+  -double retiradoEnElDia
+  +retirar()
+}
+class CDT {
+  -LocalDate vencimiento
+  +retirar()
+}
+class CobroCuotaManejo {
+  -double CUOTA
+  +cobrarMensual(List~Cuenta~)
+}
+
+class ProductoBancario {
+  <<interface>>
+  +String generarExtracto()
+}
+class ProductoCredito {
+  <<interface>>
+  +double calcularIntereses()
+  +pagarCuota()
+}
+class TarjetaCredito {
+  -double deuda
+  -double cupo
+  +retirar()
+}
+class CreditoVivienda {
+  -double saldoPendiente
+}
+class GeneradorExtractos {
+  +imprimir(List~ProductoBancario~)
+}
+
+class Main {
+  +main()
+}
+
+TransaccionService --> ValidacionTransferencia
+TransaccionService --> CalculoComision
+TransaccionService --> RepositorioTransacciones
+TransaccionService --> ComprobanteTransferencia
+TransaccionService --> NotificacionTransferencia
+TransaccionService --> AuditoriaTransferencia
+TransaccionService ..> CuentaTransaccional : usa cuentas
+
+ValidacionTransferencia <|.. ValidadorTransferencia
+CalculoComision <|.. CalculadoraComision
+CalculadoraComision --> PoliticaComision
+PoliticaComision <|.. ComisionMismoBanco
+PoliticaComision <|.. ComisionOtroBanco
+PoliticaComision <|.. ComisionInternacional
+PoliticaComision <|.. ComisionLlave
+
+RepositorioTransacciones <|.. OracleRepositorio
+RepositorioTransacciones <|.. PostgresRepositorio
+
+ComprobanteTransferencia <|.. GeneradorComprobante
+
+NotificacionTransferencia <|.. NotificadorTransferencia
+NotificadorTransferencia --> CanalNotificacion
+CanalNotificacion <|.. SmsGateway
+CanalNotificacion <|.. PushGateway
+CanalNotificacion <|.. CanalNotificacionCompuesto
+CanalNotificacionCompuesto o-- CanalNotificacion
+
+AuditoriaTransferencia <|.. RegistroAuditoria
+AuditoriaTransferencia <|.. SistemaAntifraude
+AuditoriaTransferencia <|.. AuditoriaCompuesta
+AuditoriaCompuesta o-- AuditoriaTransferencia
+
+ProductoConSaldo <|-- Cuenta
+ProductoConSaldo <|-- CDT
+CuentaTransaccional <|.. Cuenta
+ProductoBancario <|.. Cuenta
+Cuenta <|-- CuentaAhorros
+Cuenta <|-- CuentaInfantil
+CobroCuotaManejo ..> Cuenta : cobrarCargo
+
+ProductoBancario <|.. TarjetaCredito
+ProductoBancario <|.. CreditoVivienda
+ProductoCredito <|.. TarjetaCredito
+ProductoCredito <|.. CreditoVivienda
+GeneradorExtractos ..> ProductoBancario
+
+Main ..> TransaccionService : arma el sistema
+Main ..> CobroCuotaManejo : new
+Main ..> GeneradorExtractos : new
+
+style ComisionLlave fill:#e6f4ea,stroke:#1e7e34,color:#0b3d1a
+style PostgresRepositorio fill:#e6f4ea,stroke:#1e7e34,color:#0b3d1a
+style PushGateway fill:#e6f4ea,stroke:#1e7e34,color:#0b3d1a
+style CanalNotificacionCompuesto fill:#e6f4ea,stroke:#1e7e34,color:#0b3d1a
+style SistemaAntifraude fill:#e6f4ea,stroke:#1e7e34,color:#0b3d1a
+style AuditoriaCompuesta fill:#e6f4ea,stroke:#1e7e34,color:#0b3d1a
+style CuentaInfantil fill:#e6f4ea,stroke:#1e7e34,color:#0b3d1a

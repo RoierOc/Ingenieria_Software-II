@@ -265,3 +265,82 @@ Criterio de aceptación: un pago de $184.300 descuenta $185.800 de la cuenta (sa
 1. El comprobante, el notificador y la auditoría reciben "CuentaTransaccional" como destino, aunque solo usan "getNumero" y "getTitular". Para un destino que no es una cuenta hubo que presentarlo como cuenta, con un "retirar" que no aplica. Mejora propuesta: extraer una interfaz pequeña "DestinoTransferencia" ("getNumero", "getTitular", "depositar") y usarla en esos contratos.
 2. "AuditoriaTransferencia" también aloja el antifraude, como ya señaló la otra pareja en R4.
 3. "TransaccionService" es una clase concreta sin interfaz, por lo que "PagoServicios" depende directamente de ella.
+
+## Bloque 6 — Cierre
+
+### 6.1 Diagramas UML antes y después
+
+A la izquierda, el diagrama del código original (bloque 1), con las relaciones problemáticas en rojo. A la derecha, el diagrama del código final: las clases en verde se agregaron en el bloque 4 y ninguna relación queda marcada como problemática. Para que el diagrama final se pueda leer, de "Main" solo se dibujan las dependencias hacia las clases que usa directamente; las dependencias "new" hacia cada implementación que conecta se omiten. Las clases de R6 no aparecen porque están en la rama "revision-cruzada", no en "main". Cada imagen abre en tamaño completo al hacer clic.
+
+<table>
+  <tr>
+    <th>Antes (bloque 1)</th>
+    <th>Después (bloque 6)</th>
+  </tr>
+  <tr>
+    <td width="35%"><a href="docs/uml-original.svg"><img src="docs/uml-original.svg" alt="UML del código original con relaciones problemáticas en rojo"></a></td>
+    <td width="65%"><a href="docs/uml-final.svg"><img src="docs/uml-final.svg" alt="UML del código final con las clases del bloque 4 en verde"></a></td>
+  </tr>
+</table>
+
+Fuentes: "docs/uml-original.mmd" y "docs/uml-final.mmd" (Mermaid). "docs/uml-final.svg" se generó con mermaid-cli.
+
+En el diagrama original, "TransaccionService" depende de dos clases concretas y "CDT" hereda un retiro que no puede cumplir. En el final, "TransaccionService" solo apunta a seis interfaces, cada interfaz tiene sus implementaciones debajo, y la jerarquía de cuentas separa "ProductoConSaldo" de "Cuenta". Los requerimientos del bloque 4 se ven como hojas nuevas del árbol: implementaciones de interfaces que ya existían, y dos compuestos que agrupan varias implementaciones detrás de una sola.
+
+### 6.2 Tabla comparativa
+
+| Métrica | Antes | Después |
+|---|---|---|
+| Líneas del método "transferir" | 36 (líneas 7–42, con comentarios y líneas vacías) | 10 (líneas 20–29 de "TransaccionService.java") |
+| Razones distintas por las que "TransaccionService" podría cambiar | 7: validación, comisión, movimiento, persistencia, comprobante, notificación y auditoría | 1: el orden de los pasos de una transferencia |
+| Clases concretas que "TransaccionService" crea con "new" | 2: "OracleRepositorio" y "SmsGateway" | 0 |
+| Métodos vacíos o que lanzan "no aplica" | 3: "TarjetaCredito.depositar", "CreditoVivienda.depositar" y "CreditoVivienda.retirar" | 0. "CDT.retirar" y "CuentaInfantil.retirar" rechazan retiros por reglas de negocio (vencimiento y límite diario), no porque la operación no aplique |
+| ¿Se puede probar "transferir" sin Oracle ni SMS? | No | Sí: 15 pruebas con dobles, unos 0,2 s en total según Maven Surefire |
+| Número total de archivos | 11 archivos ".java" (170 líneas) | 38 archivos ".java" de producción (382 líneas) y 8 de pruebas |
+| Archivos existentes modificados en total en el bloque 4 | 4 estimados, todos en "TransaccionService.java" (R1, R3, R4 y R5). Con el problema de la cuota que apareció en R2, serían 6 | 6 modificaciones en 3 archivos distintos: "Main.java" en R1, R3, R4 y R5; "Cuenta.java" y "CobroCuotaManejo.java" en R2. "TransaccionService.java": 0 |
+
+### 6.3 Reflexión
+
+**(a) El código final tiene muchos más archivos que el original. ¿Es eso un problema? ¿En qué situación sí lo sería?**
+
+En este caso no. Se pasó de 11 a 38 archivos de producción, pero cada uno es pequeño (unas 10 líneas en promedio) y tiene una sola razón para cambiar. El nombre de cada archivo dice qué contiene: la otra pareja marcó que entendió cada clase leyendo solo su nombre y sus métodos públicos, e implementó R6 sin pedirnos explicaciones. Lo que se perdió es poder leer todo el flujo en un solo método; ahora hay que seguir las interfaces desde "Main" para saber qué implementación se usa.
+
+Sí sería un problema si los archivos nuevos fueran abstracciones que nadie sustituye. En nuestro código hay dos candidatas: "ValidacionTransferencia" y "CalculoComision" tienen una sola implementación, y las pruebas usan esas implementaciones reales en vez de dobles. Hoy no aportan lo que sí aportan "RepositorioTransacciones" o "CanalNotificacion". También sería un problema en un programa pequeño que no va a cambiar, como un script de un solo uso, o si un mismo concepto quedara repartido en tantos archivos que un cambio obligara a tocarlos todos. En el bloque 4 pasó lo contrario: cada requerimiento quedó en archivos nuevos y una línea de "Main".
+
+**(b) ¿En qué requerimiento del bloque 4 se notó más la diferencia entre el código original y el refactorizado? ¿Por qué?**
+
+En R5, la migración a PostgreSQL. En el código original había que editar "TransaccionService", la clase que mueve el dinero, para cambiar el "new OracleRepositorio()", y no existía ninguna prueba que confirmara que la transferencia seguía funcionando. En el refactorizado bastó una clase nueva ("PostgresRepositorio") y una línea en "Main"; las pruebas no cambiaron ni una línea, porque usan "RepositorioEnMemoria" y nunca conocieron Oracle. Es justo lo que pedía el criterio de aceptación.
+
+R3 y R4 muestran lo mismo: push y antifraude se agregaron con implementaciones nuevas y dos compuestos, sin tocar el flujo de "transferir". En R4, además, que una transferencia rechazada no llegue al antifraude no requirió código nuevo: lo garantiza el orden de pasos que "TransaccionService" ya tenía.
+
+**(c) ¿Hubo algún requerimiento que su diseño no aguantó bien? ¿Qué cambiarían?**
+
+Sí, R2. La primera versión de "CuentaInfantil" se pudo agregar sin modificar archivos existentes, pero reintroducía el fallo del CDT: "CobroCuotaManejo" cobraba con "retirar", así que la cuota de una cuenta infantil que ya hubiera alcanzado su límite diario detenía el lote. El control L había sacado al CDT de la jerarquía, pero dejó "retirar" como una operación que cualquier subclase podía restringir. Se corrigió separando el cargo del banco ("cobrarCargo", "final") del retiro del cliente, con 2 archivos existentes modificados.
+
+Quedan cosas que cambiaríamos:
+
+1. "CobroCuotaManejo" sigue deteniendo el lote ante el primer rechazo (por ejemplo, una cuenta sin saldo). Debería registrar los rechazos y seguir con las demás cuentas.
+2. La comisión de una transferencia cuenta para el límite diario de la cuenta infantil. Es una decisión de negocio que hoy queda implícita en el código; habría que confirmarla con el área de negocio.
+3. "AuditoriaTransferencia" también aloja el antifraude. Renombrarla a algo como "ObservadorTransferencia" describiría mejor su papel.
+4. Las mejoras que señaló la otra pareja en R6, descritas en el punto (d).
+
+**(d) ¿Qué les dijo la otra pareja en la revisión cruzada? ¿Están de acuerdo?**
+
+Marcaron "Sí" en los siete puntos de la lista de revisión. Destacaron que "TransaccionService" solo coordina y se puede probar con dobles, que los compuestos permitieron agregar push y antifraude sin tocar el flujo, que la jerarquía de productos hace que un CDT no pueda entrar al cobro de cuota ni a un pago de servicios (el error aparece al compilar), y que los dobles de prueba se reutilizaron en todos los requerimientos. Para R6 modelaron el pago como una transferencia hacia una factura y reutilizaron "TransaccionService", la validación, la comisión (con una política de comisión fija nueva), el repositorio, el comprobante, la notificación, la auditoría y el antifraude, sin copiar código.
+
+Sobre lo que les costó, estamos de acuerdo con los dos primeros puntos y en parte con el tercero:
+
+1. **El destino es una "CuentaTransaccional".** De acuerdo. El comprobante, el notificador y la auditoría solo usan "getNumero" y "getTitular" del destino, y "transferir" solo le deposita. Exigir una cuenta completa obligó a presentar la factura como cuenta, con un "retirar" que no aplica: es una violación del principio I que nuestro diseño provocó. Su propuesta de una interfaz "DestinoTransferencia" ("getNumero", "getTitular", "depositar") es la corrección adecuada. Por la misma razón, el punto "No encontramos métodos vacíos ni que lancen 'no aplica'" debió quedar en "No": el diseño los obligó a escribir uno.
+2. **El antifraude dentro de "AuditoriaTransferencia".** De acuerdo; ya lo habíamos anotado en R4.
+3. **"TransaccionService" no tiene interfaz.** De acuerdo en parte. "PagoServicios" depende de una clase concreta, pero esa clase no tiene dependencias de infraestructura y se puede construir en las pruebas con dobles, así que no impide probar el pago. Una interfaz aportaría si se quisiera probar "PagoServicios" sin ejecutar la lógica de transferencia, o si existieran varias formas de ejecutar una transacción.
+
+**(e) Si tuvieran que convencer a su jefe de invertir dos semanas en refactorizar el backend real del banco, ¿qué argumento usarían, basándose en los datos de hoy?**
+
+Que hoy cada cambio cuesta semanas porque cae en la misma clase que mueve el dinero, y después de refactorizar deja de hacerlo. Con los datos de este laboratorio:
+
+- De cinco requerimientos nuevos, cuatro se implementaron sin tocar la lógica de transferencia: una clase nueva y una línea de configuración cada uno. En el código original, esos cuatro habrían caído en "TransaccionService".
+- El cambio de proveedor de base de datos, que es la clase de decisión que le ahorra licencias al banco, se hizo con una clase nueva, y ninguna prueba tuvo que cambiar.
+- Se pasó de 0 a 15 pruebas automáticas, que corren en unos 0,2 s sin base de datos ni SMS reales. Cada cambio se puede verificar antes de llegar a producción, en vez de descubrir el error en el lote nocturno.
+- Otra pareja, sin explicaciones, agregó un producto nuevo (pago de servicios) reutilizando las piezas existentes y sin copiar código. Eso reduce la dependencia de quien escribió el código, que es justo el problema que dejó el desarrollador que se fue.
+
+Y diríamos también lo que no resuelve: el código tiene más archivos, y el diseño no aguantó solo R2; hubo que modificar dos archivos. La refactorización no elimina los cambios, pero los lleva a lugares pequeños y con pruebas, donde un error no cobra mal una transferencia.
