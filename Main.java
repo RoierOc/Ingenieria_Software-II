@@ -12,7 +12,8 @@ public class Main {
             "MISMO_BANCO", new ComisionMismoBanco(),
             "OTRO_BANCO", new ComisionOtroBanco(),
             "INTERNACIONAL", new ComisionInternacional(),
-            "LLAVE", new ComisionLlave()
+            "LLAVE", new ComisionLlave(),
+            PagoServicios.TIPO_TRANSACCION, new ComisionFija(1_500)
         ));
         TransaccionService servicio = new TransaccionService(
             new ValidadorTransferencia(), calculadora, new PostgresRepositorio(),
@@ -22,7 +23,7 @@ public class Main {
             new AuditoriaCompuesta(List.of(new RegistroAuditoria(), new SistemaAntifraude()))
         );
         servicio.transferir(ana, luis, 150_000, "OTRO_BANCO");
-
+        new PagoServicios(servicio).pagar(ana, TipoServicio.LUZ, "REF-884213", 184_300);
         new CobroCuotaManejo().cobrarMensual(List.of(ana, luis));
 
         List<ProductoBancario> productos =
