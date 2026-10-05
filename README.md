@@ -219,3 +219,49 @@ Cuota de manejo cobrada a 001-2
 Tarjeta - deuda: $0.0
 Crédito vivienda - pendiente: $1.2E8
 ```
+
+
+## Bloque 5 — Revisión cruzada (R6: pago de servicios públicos)
+
+### Qué se implementó
+
+Un pago de servicios se modeló como una transferencia cuyo destino es una factura, de modo que se reutilizó "TransaccionService" sin copiar su lógica.
+
+| Archivo | Estado | Función |
+|---|---|---|
+| "ComisionFija.java" | Nuevo | "PoliticaComision" que devuelve un valor fijo. |
+| "TipoServicio.java" | Nuevo | Enum con AGUA, LUZ, GAS e INTERNET. |
+| "FacturaServicio.java" | Nuevo | Destino del pago; su número es la referencia de la factura. |
+| "PagoServicios.java" | Nuevo | Expone "pagar(origen, servicio, referencia, valor)" y delega en "transferir". |
+| "PagoServiciosTest.java" | Nuevo | Cuatro pruebas del requerimiento. |
+| "Main.java" | Modificado | Registra la política "PAGO_SERVICIO" con $1.500 y hace un pago de demostración. |
+
+Reutilizado sin cambios: validación de monto, cálculo de comisión, movimiento de saldos, repositorio, comprobante, notificación, auditoría y antifraude. Un CDT no puede pagar servicios porque no implementa "CuentaTransaccional": "pagar(cdt, ...)" no compila.
+
+Criterio de aceptación: un pago de $184.300 descuenta $185.800 de la cuenta (saldo de 1.000.000 a 814.200), guarda la transacción ("001", "REF-884213", 184300.0, 1500.0) e imprime el comprobante con "Destino: REF-884213".
+
+### Lista de revisión
+
+| Ítem | Sí | No |
+|---|:-:|:-:|
+| Entendimos qué hace cada clase leyendo solo su nombre y sus métodos públicos | X | |
+| Pudimos reutilizar piezas existentes sin copiar y pegar código | X | |
+| Implementamos el requerimiento sin modificar la lógica de clases existentes | X | |
+| No encontramos métodos vacíos ni que lancen "no aplica" | X |  |
+| No encontramos if/switch por tipo que tuvimos que extender | X | |
+| Las pruebas existentes siguieron pasando después de nuestro cambio | X | |
+| No encontramos abstracciones innecesarias (interfaces que no aportan) | X | |
+
+### Lo mejor del diseño
+
+1. **"TransaccionService" solo coordina.** Recibe seis colaboradores por constructor, todos mediante interfaces pequeñas (validación, comisión, repositorio, comprobante, notificación y auditoría), y no crea nada con "new". Por eso se puede probar con dobles en memoria, sin Oracle ni SMS, y cada cambio de presentación o de proveedor queda fuera de la clase que mueve el dinero.
+2. **Los compuestos permiten sumar comportamiento sin tocar el flujo.** "CanalNotificacionCompuesto" y "AuditoriaCompuesta" hicieron posible agregar push (R3) y antifraude (R4) con el servicio llamando una sola vez al notificador y a la auditoría. La migración a PostgreSQL (R5) fue una implementación nueva de "RepositorioTransacciones".
+4. **La jerarquía de productos protege contra errores de contrato.** "CDT" no hereda de "Cuenta"; ambos comparten "ProductoConSaldo". Por eso un CDT no entra en el cobro de cuota ni en un pago de servicios: el error aparece al compilar, no a mitad de un lote. Además, "cobrarCargo" es "final", así que ninguna cuenta nueva con reglas de retiro puede detener el cobro de la cuota.
+5. **Las pruebas son rápidas y no dependen de infraestructura.** Los dobles ("RepositorioEnMemoria", "NotificadorEnMemoria", "SalidaConsola") se reutilizaron en todos los requerimientos, incluido el 6.
+
+
+### Lo que nos costó entender o extender
+
+1. El comprobante, el notificador y la auditoría reciben "CuentaTransaccional" como destino, aunque solo usan "getNumero" y "getTitular". Para un destino que no es una cuenta hubo que presentarlo como cuenta, con un "retirar" que no aplica. Mejora propuesta: extraer una interfaz pequeña "DestinoTransferencia" ("getNumero", "getTitular", "depositar") y usarla en esos contratos.
+2. "AuditoriaTransferencia" también aloja el antifraude, como ya señaló la otra pareja en R4.
+3. "TransaccionService" es una clase concreta sin interfaz, por lo que "PagoServicios" depende directamente de ella.
