@@ -21,7 +21,6 @@ El alcance es una demostración académica de transferencias. No incluye autenti
 | RF-07 | Emitir el comprobante de la transferencia. | La salida contiene cuentas de origen y destino, monto y comisión. |
 | RF-08 | Notificar al titular de origen tras una transferencia exitosa. | Se entrega el mensaje con monto y destino a cada canal configurado; la configuración actual incluye SMS y push. |
 | RF-09 | Emitir un registro de auditoría. | El registro de auditoría incluye fecha y hora, tipo, cuentas y monto; la configuración actual también reporta la operación al sistema antifraude. |
-
 | RF-10 | Respetar el límite diario de retiros de la cuenta infantil. | Se rechaza un retiro que supere el acumulado diario de $200.000 sin modificar el saldo; la comisión de una transferencia forma parte del retiro. El límite se reinicia al cambiar de día. |
 
 Estos criterios definen el alcance. Las 15 pruebas heredadas cubren transferencias, llave, cuenta infantil, notificaciones y antifraude; se revisará la cobertura completa en la fase 6.

@@ -1,0 +1,16 @@
+package co.edu.unal.banco.productos.aplicacion;
+
+import co.edu.unal.banco.productos.dominio.Cuenta;
+
+import java.util.List;
+
+public class CobroCuotaManejo {
+    private static final double CUOTA = 12_900;
+
+    public void cobrarMensual(List<Cuenta> cuentas) {
+        for (Cuenta cuenta : cuentas) {
+            cuenta.cobrarCargo(CUOTA);
+            System.out.println("Cuota de manejo cobrada a " + cuenta.getNumero());
+        }
+    }
+}

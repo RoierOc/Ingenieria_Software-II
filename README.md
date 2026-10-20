@@ -1,4 +1,66 @@
-# Laboratorio L2: SOLID
+# Banco Andino — Laboratorio 3
+
+Ruta A. Componente de transferencias en Java 21, dentro de un monolito modular con arquitectura hexagonal.
+
+## Documentación
+
+| Fase | Contenido |
+|---|---|
+| 1 | [Dominio, actores, requisitos y atributos de calidad](docs/lab3/01-dominio.md) |
+| 2 | [Arquitectura general y decisión de monolito modular](docs/lab3/02-arquitectura.md) |
+| 3 | [Componente, puertos, adaptadores y clases](docs/lab3/03-componente.md) |
+
+Las fases 4 a 7 quedan pendientes. Los diagramas SVG se muestran dentro de los documentos y se pueden editar como archivos vectoriales.
+
+## Ejecución
+
+Se requiere JDK 21. La primera ejecución necesita Internet para descargar Maven y las dependencias.
+
+Linux:
+
+```sh
+./mvnw test
+./mvnw package
+java -cp target/classes co.edu.unal.banco.entrada.consola.Main
+```
+
+PowerShell:
+
+```powershell
+.\mvnw.cmd test
+.\mvnw.cmd package
+java -cp target/classes co.edu.unal.banco.entrada.consola.Main
+```
+
+La consola ejecuta un ejemplo con cuentas de Ana y Luis y una transferencia de $150.000 a otro banco. Después conserva la demostración de cobro mensual y extractos de la base anterior.
+
+## Estructura
+
+```text
+src/main/java/co/edu/unal/banco/
+  entrada/consola/                 Ejemplo y composición de dependencias
+  transferencias/
+    dominio/                      Validación, comisiones y contrato de cuenta
+    aplicacion/                   Caso de uso
+    puertos/entrada/              Contrato TransferirFondos
+    puertos/salida/               Registro, comprobante, notificación y auditoría
+    adaptadores/salida/           Implementaciones de consola
+  productos/
+    dominio/                      Cuentas y otros productos de la base
+    aplicacion/                   Cobros y extractos de apoyo
+src/test/java/co/edu/unal/banco/
+  transferencias/aplicacion/      Quince pruebas y dobles en memoria
+docs/                            Documentación y diagramas
+```
+
+PostgreSQL, Oracle, SMS, push y antifraude están simulados: solo imprimen en consola. Los saldos viven en memoria y no hay recuperación ante fallos posteriores al movimiento. No es un sistema bancario de producción.
+
+
+## Laboratorio anterior
+
+La documentación siguiente corresponde al laboratorio SOLID cerrado en "c7ce69a". Sus diagramas conservan los nombres y la estructura de ese momento; la organización actual se describe en la fase 3 del laboratorio nuevo.
+
+### Laboratorio L2: SOLID
 
 - Lenguaje: Java 21
 - Proyecto: Backend de Banco Andino

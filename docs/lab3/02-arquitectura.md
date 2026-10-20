@@ -16,9 +16,8 @@ Las flechas representan llamadas o solicitudes. El recuadro central es un solo p
 | Transferencias | Validar, calcular la comisión y coordinar el movimiento y sus salidas. | Caso de uso implementado, reorganizado en la fase 3. |
 | Productos | Mantener cuentas y saldos; conservar los otros productos de la base. | Objetos en memoria durante la ejecución. |
 | Salidas de transferencias | Traducir las llamadas hacia registro, mensajería, comprobante y auditoría. | Implementaciones de consola. |
-| Registro bancario / PostgreSQL u Oracle | Almacenar operaciones fuera del proceso. | Destino previsto; "PostgresRepositorio" es la implementación seleccionada; "OracleRepositorio" se conserva como alternativa. Ambas simulan la solicitud y no persiste. |
+| Registro bancario / PostgreSQL u Oracle | Almacenar operaciones fuera del proceso. | Destino previsto; "PostgresRepositorio" es la implementación seleccionada; "OracleRepositorio" se conserva como alternativa. Ambas simulan la solicitud sin persistir datos. |
 | Proveedores SMS y push | Entregar mensajes al titular. | "SmsGateway" y "PushGateway" simulan el envío; "CanalNotificacionCompuesto" llama a ambos. |
-
 | Sistema antifraude | Recibir el reporte de una transferencia aceptada. | "SistemaAntifraude" imprime el reporte; "AuditoriaCompuesta" lo combina con "RegistroAuditoria". |
 
 ## Comparación con microservicios
