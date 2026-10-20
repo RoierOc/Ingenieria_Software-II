@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="800" viewBox="0 0 1000 800" role="img" aria-labelledby="title desc">
+<title id="title">Banco Andino · arquitectura general</title>
+<desc id="desc">Flechas: llamadas o solicitudes. Cuentas: memoria del proceso.
+Comprobante y auditoría se imprimen en consola; Registro, mensajería y antifraude son simulaciones.</desc>
+<defs><marker id="flecha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/></marker></defs>
+<rect width="100%" height="100%" fill="white"/>
+<text x="35" y="38" font-family="sans-serif" font-size="24" fill="#0f172a">Banco Andino · arquitectura general</text>
+<rect x="30" y="75" width="210" height="105" rx="8" fill="#f1f5f9" stroke="#64748b"/>
+<text x="45" y="103" font-family="sans-serif" font-size="18" font-weight="bold" fill="#0f172a">Cliente</text>
+<text x="45" y="129" font-family="sans-serif" font-size="16" fill="#334155">Solicitud y resultado</text>
+<rect x="280" y="75" width="680" height="455" rx="8" fill="#f8fafc" stroke="#64748b"/>
+<text x="295" y="103" font-family="sans-serif" font-size="18" font-weight="bold" fill="#0f172a">Un proceso Java · monolito modular</text>
+<rect x="310" y="130" width="300" height="90" rx="8" fill="#e0f2fe" stroke="#64748b"/>
+<text x="325" y="158" font-family="sans-serif" font-size="18" font-weight="bold" fill="#0f172a">Consola y configuración</text>
+<text x="325" y="184" font-family="sans-serif" font-size="16" fill="#334155">Main</text>
+<rect x="310" y="280" width="300" height="110" rx="8" fill="#dcfce7" stroke="#64748b"/>
+<text x="325" y="308" font-family="sans-serif" font-size="18" font-weight="bold" fill="#0f172a">Transferencias</text>
+<text x="325" y="334" font-family="sans-serif" font-size="16" fill="#334155">Caso de uso y reglas</text>
+<text x="325" y="358" font-family="sans-serif" font-size="16" fill="#334155">Puertos y adaptadores</text>
+<rect x="660" y="280" width="270" height="110" rx="8" fill="#fef3c7" stroke="#64748b"/>
+<text x="675" y="308" font-family="sans-serif" font-size="18" font-weight="bold" fill="#0f172a">Productos</text>
+<text x="675" y="334" font-family="sans-serif" font-size="16" fill="#334155">Cuentas y saldos</text>
+<text x="675" y="358" font-family="sans-serif" font-size="16" fill="#334155">en memoria</text>
+<rect x="310" y="440" width="620" height="65" rx="8" fill="#e0f2fe" stroke="#64748b"/>
+<text x="325" y="468" font-family="sans-serif" font-size="18" font-weight="bold" fill="#0f172a">Adaptadores de salida</text>
+<rect x="280" y="600" width="300" height="105" rx="8" fill="#f1f5f9" stroke="#64748b"/>
+<text x="295" y="628" font-family="sans-serif" font-size="18" font-weight="bold" fill="#0f172a">PostgreSQL / Oracle</text>
+<text x="295" y="654" font-family="sans-serif" font-size="16" fill="#334155">Destino conceptual</text>
+<text x="295" y="678" font-family="sans-serif" font-size="16" fill="#334155">Sin base de datos conectada</text>
+<rect x="630" y="600" width="330" height="105" rx="8" fill="#f1f5f9" stroke="#64748b"/>
+<text x="645" y="628" font-family="sans-serif" font-size="18" font-weight="bold" fill="#0f172a">SMS / push / antifraude</text>
+<text x="645" y="654" font-family="sans-serif" font-size="16" fill="#334155">Destino conceptual</text>
+<text x="645" y="678" font-family="sans-serif" font-size="16" fill="#334155">Sin servicios conectados</text>
+<path d="M 240 155 H 310" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#flecha)"/>
+<text x="245" y="143" font-family="sans-serif" font-size="15" fill="#334155">solicita</text>
+<path d="M 460 220 V 280" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#flecha)"/>
+<text x="475" y="254" font-family="sans-serif" font-size="15" fill="#334155">invoca</text>
+<path d="M 610 335 H 660" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#flecha)"/>
+<text x="615" y="323" font-family="sans-serif" font-size="15" fill="#334155">usa</text>
+<path d="M 460 390 V 440" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#flecha)"/>
+<text x="475" y="422" font-family="sans-serif" font-size="15" fill="#334155">delega</text>
+<path d="M 430 505 V 600" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#flecha)"/>
+<text x="295" y="563" font-family="sans-serif" font-size="15" fill="#334155">registro simulado</text>
+<path d="M 790 505 V 600" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#flecha)"/>
+<text x="800" y="563" font-family="sans-serif" font-size="15" fill="#334155">reporte simulado</text>
+<text x="35" y="745" font-family="sans-serif" font-size="15" fill="#475569">Flechas: llamadas o solicitudes. Cuentas: memoria del proceso.</text>
+<text x="35" y="768" font-family="sans-serif" font-size="15" fill="#475569">Comprobante y auditoría se imprimen en consola; Registro, mensajería y antifraude son simulaciones.</text>
+</svg>
