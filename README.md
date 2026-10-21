@@ -9,8 +9,9 @@ Ruta A. Componente de transferencias en Java 21, dentro de un monolito modular c
 | 1 | [Dominio, actores, requisitos y atributos de calidad](docs/lab3/01-dominio.md) |
 | 2 | [Arquitectura general y decisión de monolito modular](docs/lab3/02-arquitectura.md) |
 | 3 | [Componente, puertos, adaptadores y clases](docs/lab3/03-componente.md) |
+| 4 | [Diagrama de clases, evidencia SOLID y ejemplos de antes y después](docs/lab3/04-solid.md) |
 
-Las fases 4 a 7 quedan pendientes. Los diagramas SVG se muestran dentro de los documentos y se pueden editar como archivos vectoriales.
+Las fases 5 a 7 quedan pendientes. Los diagramas SVG se muestran dentro de los documentos y se pueden editar como archivos vectoriales.
 
 ## Ejecución
 

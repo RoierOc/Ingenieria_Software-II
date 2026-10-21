@@ -1,0 +1,177 @@
+classDiagram
+direction TB
+
+namespace entrada_consola {
+  class Main {
+    +main(String[] args)$
+  }
+}
+
+namespace puertos_entrada {
+  class TransferirFondos {
+    <<interface>>
+    +transferir(origen, destino, monto, tipo)
+  }
+}
+
+namespace aplicacion {
+  class TransaccionService {
+    -ValidacionTransferencia validador
+    -CalculoComision calculadora
+    -RepositorioTransacciones repositorio
+    -ComprobanteTransferencia comprobante
+    -NotificacionTransferencia notificador
+    -AuditoriaTransferencia auditoria
+    +transferir(origen, destino, monto, tipo)
+  }
+}
+
+namespace dominio {
+  class CuentaTransaccional {
+    <<interface>>
+    +getNumero() String
+    +getTitular() String
+    +depositar(monto)
+    +retirar(monto)
+  }
+  class ValidacionTransferencia {
+    <<interface>>
+    +validar(monto)
+  }
+  class ValidadorTransferencia {
+    +validar(monto)
+  }
+  class CalculoComision {
+    <<interface>>
+    +calcular(monto, tipo) double
+  }
+  class CalculadoraComision {
+    -Map~String, PoliticaComision~ politicas
+    +calcular(monto, tipo) double
+  }
+  class PoliticaComision {
+    <<interface>>
+    +calcular(monto) double
+  }
+  class ComisionMismoBanco
+  class ComisionOtroBanco
+  class ComisionInternacional
+  class ComisionLlave
+}
+
+namespace puertos_salida {
+  class RepositorioTransacciones {
+    <<interface>>
+    +guardarTransaccion(origen, destino, monto, comision)
+  }
+  class ComprobanteTransferencia {
+    <<interface>>
+    +generar(origen, destino, monto, comision)
+  }
+  class NotificacionTransferencia {
+    <<interface>>
+    +notificar(origen, destino, monto)
+  }
+  class CanalNotificacion {
+    <<interface>>
+    +enviar(destinatario, mensaje)
+  }
+  class AuditoriaTransferencia {
+    <<interface>>
+    +registrar(origen, destino, monto, tipo)
+  }
+}
+
+namespace adaptadores_salida {
+  class PostgresRepositorio
+  class OracleRepositorio
+  class GeneradorComprobante
+  class NotificadorTransferencia {
+    -CanalNotificacion canal
+    +notificar(origen, destino, monto)
+  }
+  class CanalNotificacionCompuesto {
+    -List~CanalNotificacion~ canales
+    +enviar(destinatario, mensaje)
+  }
+  class SmsGateway
+  class PushGateway
+  class AuditoriaCompuesta {
+    -List~AuditoriaTransferencia~ auditorias
+    +registrar(origen, destino, monto, tipo)
+  }
+  class RegistroAuditoria
+  class SistemaAntifraude
+}
+
+namespace productos_dominio {
+  class ProductoConSaldo {
+    <<abstract>>
+    #String numero
+    #String titular
+    #double saldo
+    +depositar(monto)
+    #descontarSaldo(monto)
+  }
+  class Cuenta {
+    +retirar(monto)
+    +cobrarCargo(monto)
+    +generarExtracto() String
+  }
+  class CuentaAhorros
+  class CuentaInfantil {
+    -Clock reloj
+    -double retiradoEnElDia
+    +retirar(monto)
+  }
+  class CDT {
+    -LocalDate vencimiento
+    +retirar(monto)
+  }
+  class ProductoBancario {
+    <<interface>>
+    +generarExtracto() String
+  }
+}
+
+Main ..> TransferirFondos : usa
+Main ..> TransaccionService : crea
+
+TransferirFondos <|.. TransaccionService
+TransferirFondos ..> CuentaTransaccional
+
+TransaccionService --> ValidacionTransferencia
+TransaccionService --> CalculoComision
+TransaccionService --> RepositorioTransacciones
+TransaccionService --> ComprobanteTransferencia
+TransaccionService --> NotificacionTransferencia
+TransaccionService --> AuditoriaTransferencia
+
+ValidacionTransferencia <|.. ValidadorTransferencia
+CalculoComision <|.. CalculadoraComision
+CalculadoraComision o-- PoliticaComision
+PoliticaComision <|.. ComisionMismoBanco
+PoliticaComision <|.. ComisionOtroBanco
+PoliticaComision <|.. ComisionInternacional
+PoliticaComision <|.. ComisionLlave
+
+RepositorioTransacciones <|.. PostgresRepositorio
+RepositorioTransacciones <|.. OracleRepositorio
+ComprobanteTransferencia <|.. GeneradorComprobante
+NotificacionTransferencia <|.. NotificadorTransferencia
+NotificadorTransferencia --> CanalNotificacion
+CanalNotificacion <|.. CanalNotificacionCompuesto
+CanalNotificacion <|.. SmsGateway
+CanalNotificacion <|.. PushGateway
+CanalNotificacionCompuesto o-- CanalNotificacion
+AuditoriaTransferencia <|.. AuditoriaCompuesta
+AuditoriaTransferencia <|.. RegistroAuditoria
+AuditoriaTransferencia <|.. SistemaAntifraude
+AuditoriaCompuesta o-- AuditoriaTransferencia
+
+ProductoConSaldo <|-- Cuenta
+ProductoConSaldo <|-- CDT
+Cuenta <|-- CuentaAhorros
+Cuenta <|-- CuentaInfantil
+CuentaTransaccional <|.. Cuenta
+ProductoBancario <|.. Cuenta
