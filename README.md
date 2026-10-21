@@ -1,4 +1,5 @@
 # Banco Andino — Laboratorio 3
+Presentado por: Roger Bonilla, Julian Cadena y Nicolas Jaramillo
 
 Ruta A. Componente de transferencias en Java 21, dentro de un monolito modular con arquitectura hexagonal.
 
