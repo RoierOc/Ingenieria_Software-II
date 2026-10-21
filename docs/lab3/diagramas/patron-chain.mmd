@@ -1,0 +1,38 @@
+classDiagram
+direction TB
+class TransaccionService {
+  <<Client>>
+}
+class ValidacionTransferencia {
+  <<interface>>
+  +validar(origen, destino, monto)
+}
+class ReglaTransferencia {
+  <<Handler>>
+  -ReglaTransferencia siguiente
+  +encadenar(primera, resto)$ ValidacionTransferencia
+  +validar(origen, destino, monto)
+  #comprobar(origen, destino, monto)*
+}
+class MontoPositivo {
+  <<ConcreteHandler>>
+}
+class TopePorTransferencia {
+  <<ConcreteHandler>>
+  -double tope
+}
+class CuentasDistintas {
+  <<ConcreteHandler>>
+}
+class ValidadorTransferencia {
+  <<arma la cadena>>
+  -ValidacionTransferencia reglas
+}
+TransaccionService --> ValidacionTransferencia
+ValidacionTransferencia <|.. ReglaTransferencia
+ValidacionTransferencia <|.. ValidadorTransferencia
+ReglaTransferencia --> ReglaTransferencia : siguiente
+ReglaTransferencia <|-- MontoPositivo
+ReglaTransferencia <|-- TopePorTransferencia
+ReglaTransferencia <|-- CuentasDistintas
+ValidadorTransferencia ..> ReglaTransferencia : MontoPositivo → Tope → CuentasDistintas

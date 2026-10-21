@@ -1,0 +1,47 @@
+classDiagram
+direction TB
+class InfraestructuraTransferencias {
+  <<AbstractFactory>>
+  +crearRepositorio() RepositorioTransacciones
+  +crearComprobante() ComprobanteTransferencia
+  +crearNotificacion() NotificacionTransferencia
+  +crearAuditoria() AuditoriaTransferencia
+}
+class InfraestructuraProduccion {
+  <<ConcreteFactory>>
+}
+class InfraestructuraEnMemoria {
+  <<ConcreteFactory · pruebas>>
+}
+class TransaccionServiceBuilder {
+  <<Client>>
+}
+class RepositorioTransacciones {
+  <<AbstractProduct>>
+}
+class NotificacionTransferencia {
+  <<AbstractProduct>>
+}
+class PostgresRepositorio {
+  <<ConcreteProduct>>
+}
+class NotificadorTransferencia {
+  <<ConcreteProduct · SMS + push>>
+}
+class RepositorioEnMemoria {
+  <<ConcreteProduct>>
+}
+class NotificadorEnMemoria {
+  <<ConcreteProduct>>
+}
+TransaccionServiceBuilder --> InfraestructuraTransferencias
+InfraestructuraTransferencias <|.. InfraestructuraProduccion
+InfraestructuraTransferencias <|.. InfraestructuraEnMemoria
+RepositorioTransacciones <|.. PostgresRepositorio
+RepositorioTransacciones <|.. RepositorioEnMemoria
+NotificacionTransferencia <|.. NotificadorTransferencia
+NotificacionTransferencia <|.. NotificadorEnMemoria
+InfraestructuraProduccion ..> PostgresRepositorio : crea
+InfraestructuraProduccion ..> NotificadorTransferencia : crea
+InfraestructuraEnMemoria ..> RepositorioEnMemoria : crea
+InfraestructuraEnMemoria ..> NotificadorEnMemoria : crea

@@ -1,0 +1,31 @@
+classDiagram
+direction LR
+class Main {
+  <<Director / Client>>
+}
+class TransaccionServiceBuilder {
+  <<Builder>>
+  -ValidacionTransferencia validador
+  -Map~String, PoliticaComision~ politicas
+  -InfraestructuraTransferencias infraestructura
+  +validarCon(validador) TransaccionServiceBuilder
+  +comision(tipo, politica) TransaccionServiceBuilder
+  +infraestructura(fabrica) TransaccionServiceBuilder
+  +construir() TransaccionService
+}
+class TransaccionService {
+  <<Product>>
+  +transferir(origen, destino, monto, tipo)
+}
+class CalculadoraComision {
+  <<parte del Product>>
+}
+class ValidadorTransferencia {
+  <<parte del Product>>
+}
+Main ..> TransaccionServiceBuilder : configura paso a paso
+TransaccionServiceBuilder ..> TransaccionService : construir()
+TransaccionServiceBuilder ..> CalculadoraComision : crea con las políticas
+TransaccionServiceBuilder ..> ValidadorTransferencia : valor por defecto
+TransaccionService --> CalculadoraComision
+TransaccionService --> ValidadorTransferencia

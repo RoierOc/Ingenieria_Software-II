@@ -10,8 +10,9 @@ Ruta A. Componente de transferencias en Java 21, dentro de un monolito modular c
 | 2 | [Arquitectura general y decisión de monolito modular](docs/lab3/02-arquitectura.md) |
 | 3 | [Componente, puertos, adaptadores y clases](docs/lab3/03-componente.md) |
 | 4 | [Diagrama de clases, evidencia SOLID y ejemplos de antes y después](docs/lab3/04-solid.md) |
+| 5 | [Fichas de los seis patrones de diseño](docs/lab3/05-patrones.md) |
 
-Las fases 5 a 7 quedan pendientes. Los diagramas SVG se muestran dentro de los documentos y se pueden editar como archivos vectoriales.
+Las fases 6 y 7 quedan pendientes. Los diagramas SVG se muestran dentro de los documentos y se pueden editar como archivos vectoriales.
 
 ## Ejecución
 
@@ -41,18 +42,29 @@ La consola ejecuta un ejemplo con cuentas de Ana y Luis y una transferencia de $
 src/main/java/co/edu/unal/banco/
   entrada/consola/                 Ejemplo y composición de dependencias
   transferencias/
-    dominio/                      Validación, comisiones y contrato de cuenta
-    aplicacion/                   Caso de uso
+    dominio/                      Reglas de validación, comisiones y contrato de cuenta
+    aplicacion/                   Caso de uso, builder y fábrica de infraestructura
     puertos/entrada/              Contrato TransferirFondos
     puertos/salida/               Registro, comprobante, notificación y auditoría
-    adaptadores/salida/           Implementaciones de consola
+    adaptadores/salida/           Implementaciones de consola y fábrica de producción
   productos/
     dominio/                      Cuentas y otros productos de la base
     aplicacion/                   Cobros y extractos de apoyo
 src/test/java/co/edu/unal/banco/
-  transferencias/aplicacion/      Quince pruebas y dobles en memoria
+  transferencias/aplicacion/      Veintidós pruebas, dobles y fábrica en memoria
 docs/                            Documentación y diagramas
 ```
+
+## Patrones
+
+| Familia | Patrón | Archivo y clase |
+|---|---|---|
+| Creacional | Builder | [TransaccionServiceBuilder.java](src/main/java/co/edu/unal/banco/transferencias/aplicacion/TransaccionServiceBuilder.java) |
+| Creacional | Abstract Factory | [InfraestructuraTransferencias.java](src/main/java/co/edu/unal/banco/transferencias/aplicacion/InfraestructuraTransferencias.java), [InfraestructuraProduccion.java](src/main/java/co/edu/unal/banco/transferencias/adaptadores/salida/InfraestructuraProduccion.java), [InfraestructuraEnMemoria.java](src/test/java/co/edu/unal/banco/transferencias/aplicacion/InfraestructuraEnMemoria.java) |
+| Estructural | Adapter | [NotificadorTransferencia.java](src/main/java/co/edu/unal/banco/transferencias/adaptadores/salida/NotificadorTransferencia.java) |
+| Estructural | Composite | [CanalNotificacionCompuesto.java](src/main/java/co/edu/unal/banco/transferencias/adaptadores/salida/CanalNotificacionCompuesto.java), [AuditoriaCompuesta.java](src/main/java/co/edu/unal/banco/transferencias/adaptadores/salida/AuditoriaCompuesta.java) |
+| Comportamiento | Strategy | [PoliticaComision.java](src/main/java/co/edu/unal/banco/transferencias/dominio/PoliticaComision.java), [CalculadoraComision.java](src/main/java/co/edu/unal/banco/transferencias/dominio/CalculadoraComision.java) y las cuatro "Comision*" |
+| Comportamiento | Chain of Responsibility | [ReglaTransferencia.java](src/main/java/co/edu/unal/banco/transferencias/dominio/ReglaTransferencia.java), "MontoPositivo", "TopePorTransferencia", "CuentasDistintas" y [ValidadorTransferencia.java](src/main/java/co/edu/unal/banco/transferencias/dominio/ValidadorTransferencia.java) |
 
 PostgreSQL, Oracle, SMS, push y antifraude están simulados: solo imprimen en consola. Los saldos viven en memoria y no hay recuperación ante fallos posteriores al movimiento. No es un sistema bancario de producción.
 

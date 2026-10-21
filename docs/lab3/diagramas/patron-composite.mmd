@@ -1,0 +1,47 @@
+classDiagram
+direction TB
+class NotificadorTransferencia {
+  <<Client>>
+}
+class CanalNotificacion {
+  <<Component>>
+  +enviar(destinatario, mensaje)
+}
+class CanalNotificacionCompuesto {
+  <<Composite>>
+  -List~CanalNotificacion~ canales
+  +enviar(destinatario, mensaje)
+}
+class SmsGateway {
+  <<Leaf>>
+}
+class PushGateway {
+  <<Leaf>>
+}
+class TransaccionService {
+  <<Client>>
+}
+class AuditoriaTransferencia {
+  <<Component>>
+  +registrar(origen, destino, monto, tipo)
+}
+class AuditoriaCompuesta {
+  <<Composite>>
+  -List~AuditoriaTransferencia~ auditorias
+}
+class RegistroAuditoria {
+  <<Leaf>>
+}
+class SistemaAntifraude {
+  <<Leaf>>
+}
+NotificadorTransferencia --> CanalNotificacion
+CanalNotificacion <|.. CanalNotificacionCompuesto
+CanalNotificacion <|.. SmsGateway
+CanalNotificacion <|.. PushGateway
+CanalNotificacionCompuesto o-- CanalNotificacion : canales
+TransaccionService --> AuditoriaTransferencia
+AuditoriaTransferencia <|.. AuditoriaCompuesta
+AuditoriaTransferencia <|.. RegistroAuditoria
+AuditoriaTransferencia <|.. SistemaAntifraude
+AuditoriaCompuesta o-- AuditoriaTransferencia : auditorias

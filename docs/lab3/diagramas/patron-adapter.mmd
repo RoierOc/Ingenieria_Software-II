@@ -1,0 +1,25 @@
+classDiagram
+direction LR
+class TransaccionService {
+  <<Client>>
+}
+class NotificacionTransferencia {
+  <<Target>>
+  +notificar(origen, destino, monto)
+}
+class NotificadorTransferencia {
+  <<Adapter>>
+  -CanalNotificacion canal
+  +notificar(origen, destino, monto)
+}
+class CanalNotificacion {
+  <<Adaptee>>
+  +enviar(destinatario, mensaje)
+}
+class SmsGateway
+class PushGateway
+TransaccionService --> NotificacionTransferencia
+NotificacionTransferencia <|.. NotificadorTransferencia
+NotificadorTransferencia --> CanalNotificacion : enviar(titular, texto)
+CanalNotificacion <|.. SmsGateway
+CanalNotificacion <|.. PushGateway

@@ -30,7 +30,7 @@ public class TransaccionService implements TransferirFondos {
 
     @Override
     public void transferir(CuentaTransaccional origen, CuentaTransaccional destino, double monto, String tipo) {
-        validador.validar(monto);
+        validador.validar(origen, destino, monto);
         double comision = calculadora.calcular(monto, tipo);
         origen.retirar(monto + comision);
         destino.depositar(monto);

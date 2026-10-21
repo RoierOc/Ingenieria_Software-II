@@ -15,6 +15,22 @@ namespace puertos_entrada {
 }
 
 namespace aplicacion {
+  class TransaccionServiceBuilder {
+    -ValidacionTransferencia validador
+    -Map~String, PoliticaComision~ politicas
+    -InfraestructuraTransferencias infraestructura
+    +validarCon(validador) TransaccionServiceBuilder
+    +comision(tipo, politica) TransaccionServiceBuilder
+    +infraestructura(fabrica) TransaccionServiceBuilder
+    +construir() TransaccionService
+  }
+  class InfraestructuraTransferencias {
+    <<interface>>
+    +crearRepositorio() RepositorioTransacciones
+    +crearComprobante() ComprobanteTransferencia
+    +crearNotificacion() NotificacionTransferencia
+    +crearAuditoria() AuditoriaTransferencia
+  }
   class TransaccionService {
     -ValidacionTransferencia validador
     -CalculoComision calculadora
@@ -36,11 +52,24 @@ namespace dominio {
   }
   class ValidacionTransferencia {
     <<interface>>
-    +validar(monto)
+    +validar(origen, destino, monto)
   }
   class ValidadorTransferencia {
-    +validar(monto)
+    -ValidacionTransferencia reglas
+    +validar(origen, destino, monto)
   }
+  class ReglaTransferencia {
+    <<abstract>>
+    -ReglaTransferencia siguiente
+    +encadenar(primera, resto)$ ValidacionTransferencia
+    +validar(origen, destino, monto)
+    #comprobar(origen, destino, monto)*
+  }
+  class MontoPositivo
+  class TopePorTransferencia {
+    -double tope
+  }
+  class CuentasDistintas
   class CalculoComision {
     <<interface>>
     +calcular(monto, tipo) double
@@ -83,6 +112,7 @@ namespace puertos_salida {
 }
 
 namespace adaptadores_salida {
+  class InfraestructuraProduccion
   class PostgresRepositorio
   class OracleRepositorio
   class GeneradorComprobante
@@ -135,7 +165,11 @@ namespace productos_dominio {
 }
 
 Main ..> TransferirFondos : usa
-Main ..> TransaccionService : crea
+Main ..> TransaccionServiceBuilder : configura
+Main ..> InfraestructuraProduccion : elige
+TransaccionServiceBuilder ..> TransaccionService : construir()
+TransaccionServiceBuilder --> InfraestructuraTransferencias
+InfraestructuraTransferencias <|.. InfraestructuraProduccion
 
 TransferirFondos <|.. TransaccionService
 TransferirFondos ..> CuentaTransaccional
@@ -148,6 +182,12 @@ TransaccionService --> NotificacionTransferencia
 TransaccionService --> AuditoriaTransferencia
 
 ValidacionTransferencia <|.. ValidadorTransferencia
+ValidacionTransferencia <|.. ReglaTransferencia
+ReglaTransferencia --> ReglaTransferencia : siguiente
+ReglaTransferencia <|-- MontoPositivo
+ReglaTransferencia <|-- TopePorTransferencia
+ReglaTransferencia <|-- CuentasDistintas
+ValidadorTransferencia ..> ReglaTransferencia : encadena
 CalculoComision <|.. CalculadoraComision
 CalculadoraComision o-- PoliticaComision
 PoliticaComision <|.. ComisionMismoBanco

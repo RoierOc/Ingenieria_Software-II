@@ -6,7 +6,7 @@ El diagrama muestra el componente de transferencias en su estado actual (rama "l
 
 ![Diagrama de clases del componente de transferencias](diagramas/clases-transferencias.svg)
 
-Fuente: "diagramas/clases-transferencias.mmd" (Mermaid). Para que el diagrama se pueda leer, de "Main" solo se dibujan "TransferirFondos" y "TransaccionService"; las demás clases que crea al armar el sistema se omiten.
+Fuente: "diagramas/clases-transferencias.mmd" (Mermaid). Para que el diagrama se pueda leer, de "Main" solo se dibujan "TransferirFondos", "TransaccionServiceBuilder" e "InfraestructuraProduccion"; las cuentas y comisiones que crea se omiten. El diagrama ya incluye las clases agregadas en la fase 5 (cadena de validación, builder y fábrica de infraestructura).
 
 Lectura rápida:
 
@@ -27,7 +27,7 @@ Lectura rápida:
 | I | "ProductoBancario" y "ProductoCredito" | "ProductoBancario" solo exige "generarExtracto". Intereses y cuotas están en "ProductoCredito". Ninguna clase tiene métodos vacíos por "no aplica". |
 | I | Puertos de salida | Cada puerto tiene un solo método ("guardarTransaccion", "generar", "notificar", "registrar", "enviar"). Un adaptador implementa solo lo que hace. |
 | D | Constructor de "TransaccionService" | Recibe seis abstracciones y no crea nada con "new". Ninguna clase de "aplicacion", "dominio" o "puertos" importa un adaptador (0 importaciones, AC-03). |
-| D | "Main" | Es el único lugar que conoce las clases concretas y decide si se usa PostgreSQL u Oracle, SMS o push. Las pruebas arman el mismo servicio con "RepositorioEnMemoria" y "NotificadorEnMemoria". |
+| D | "Main" e "InfraestructuraProduccion" | "Main" elige la familia de infraestructura; "InfraestructuraProduccion" es la única clase que decide si se usa PostgreSQL u Oracle, SMS o push. Las pruebas arman el mismo servicio con "RepositorioEnMemoria" y "NotificadorEnMemoria". |
 
 ## Antes y después
 
@@ -64,7 +64,7 @@ Después ("TransaccionService.java", líneas 32–41):
 
 ```java
 public void transferir(CuentaTransaccional origen, CuentaTransaccional destino, double monto, String tipo) {
-    validador.validar(monto);
+    validador.validar(origen, destino, monto);
     double comision = calculadora.calcular(monto, tipo);
     origen.retirar(monto + comision);
     destino.depositar(monto);
@@ -121,7 +121,7 @@ private final SmsGateway sms = new SmsGateway();
 
 El servicio de alto nivel dependía de dos detalles de infraestructura y no se podía probar sin ellos.
 
-Después, el servicio recibe "RepositorioTransacciones" y "NotificacionTransferencia" por constructor, y "Main" elige las implementaciones:
+Después, el servicio recibe "RepositorioTransacciones" y "NotificacionTransferencia" por constructor, y "Main" elige las implementaciones. Así quedó al cerrar el laboratorio anterior:
 
 ```java
 TransferirFondos servicio = new TransaccionService(
@@ -133,7 +133,7 @@ TransferirFondos servicio = new TransaccionService(
 );
 ```
 
-La migración de Oracle a PostgreSQL (R5) cambió solo esa línea de "Main". Las 15 pruebas usan "RepositorioEnMemoria" y no cambiaron.
+La migración de Oracle a PostgreSQL (R5) cambió solo esa línea de "Main". Las 15 pruebas usan "RepositorioEnMemoria" y no cambiaron. En la fase 5 esta composición pasa a "TransaccionServiceBuilder" e "InfraestructuraProduccion"; la dependencia del servicio hacia abstracciones no cambia.
 
 ### I: productos bancarios (resumen)
 
@@ -155,5 +155,5 @@ El diseño no es perfecto. Estos puntos se tendrán en cuenta en la fase 5:
 
 1. **I en el destino.** El comprobante, el notificador y la auditoría reciben "CuentaTransaccional" como destino, aunque solo usan "getNumero" y "getTitular", y "transferir" solo le deposita. Un destino que no sea una cuenta (por ejemplo, una factura) tendría que implementar un "retirar" que no aplica. La revisión cruzada del laboratorio anterior propuso una interfaz "DestinoTransferencia".
 2. **S en el nombre de un puerto.** "AuditoriaTransferencia" también aloja el antifraude. Su papel real es "acción posterior a una transferencia exitosa".
-3. **Abstracciones con una sola implementación.** "ValidacionTransferencia" y "CalculoComision" tienen una sola implementación y las pruebas usan la real. Cumplen D, pero hoy no aportan una sustitución.
+3. **Abstracciones con una sola implementación.** "CalculoComision" tiene una sola implementación y las pruebas usan la real. Cumple D, pero hoy no aporta una sustitución. "ValidacionTransferencia" tenía el mismo problema; en la fase 5 pasó a ser la interfaz de una cadena de reglas.
 4. **El tipo es un "String".** Un tipo mal escrito en "Main" solo se detecta al ejecutar, cuando "CalculadoraComision" no encuentra la política.

@@ -1,35 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1020" viewBox="0 0 1000 1020" role="img" aria-labelledby="title desc">
 <title id="title">Transferencias · dependencias de código</title>
-<desc id="desc">Flechas: dependencia de código hacia contratos y reglas. Main ensambla los adaptadores.
+<desc id="desc">Flechas: dependencia de código hacia contratos y reglas. InfraestructuraProduccion crea los adaptadores.
 El núcleo (aplicación, dominio y puertos) no importa implementaciones de infraestructura.</desc>
 <defs><marker id="flecha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/></marker></defs>
 <rect width="100%" height="100%" fill="white"/>
 <text x="35" y="38" font-family="sans-serif" font-size="24" fill="#0f172a">Transferencias · dependencias de código</text>
 <rect x="30" y="80" width="940" height="110" rx="8" fill="#e0f2fe" stroke="#64748b"/>
 <text x="45" y="108" font-family="sans-serif" font-size="18" font-weight="bold" fill="#0f172a">Entrada y composición · entrada.consola</text>
-<text x="45" y="134" font-family="sans-serif" font-size="16" fill="#334155">Main configura los colaboradores y usa TransferirFondos.</text>
-<text x="45" y="158" font-family="sans-serif" font-size="16" fill="#334155">Solo esta composición selecciona las implementaciones concretas.</text>
+<text x="45" y="134" font-family="sans-serif" font-size="16" fill="#334155">Main registra comisiones en el builder, elige la infraestructura y usa TransferirFondos.</text>
+<text x="45" y="158" font-family="sans-serif" font-size="16" fill="#334155">Solo Main y la fábrica de producción conocen implementaciones concretas.</text>
 <rect x="300" y="255" width="400" height="85" rx="8" fill="#fef3c7" stroke="#64748b"/>
 <text x="315" y="283" font-family="sans-serif" font-size="18" font-weight="bold" fill="#0f172a">Puerto de entrada</text>
 <text x="315" y="309" font-family="sans-serif" font-size="16" fill="#334155">TransferirFondos</text>
 <rect x="300" y="400" width="400" height="90" rx="8" fill="#dcfce7" stroke="#64748b"/>
 <text x="315" y="428" font-family="sans-serif" font-size="18" font-weight="bold" fill="#0f172a">Aplicación</text>
-<text x="315" y="454" font-family="sans-serif" font-size="16" fill="#334155">TransaccionService</text>
+<text x="315" y="454" font-family="sans-serif" font-size="14" fill="#334155">TransaccionService / TransaccionServiceBuilder</text>
+<text x="315" y="476" font-family="sans-serif" font-size="14" fill="#334155">InfraestructuraTransferencias (fábrica abstracta)</text>
 <rect x="30" y="565" width="440" height="155" rx="8" fill="#dcfce7" stroke="#64748b"/>
 <text x="45" y="593" font-family="sans-serif" font-size="18" font-weight="bold" fill="#0f172a">Dominio de transferencias</text>
 <text x="45" y="619" font-family="sans-serif" font-size="16" fill="#334155">CuentaTransaccional</text>
 <text x="45" y="643" font-family="sans-serif" font-size="16" fill="#334155">ValidadorTransferencia / CalculadoraComision</text>
 <text x="45" y="667" font-family="sans-serif" font-size="16" fill="#334155">PoliticaComision: incluye ComisionLlave</text>
+<text x="45" y="691" font-family="sans-serif" font-size="16" fill="#334155">ReglaTransferencia: cadena de validación</text>
 <rect x="520" y="565" width="450" height="155" rx="8" fill="#fef3c7" stroke="#64748b"/>
 <text x="535" y="593" font-family="sans-serif" font-size="18" font-weight="bold" fill="#0f172a">Puertos de salida</text>
 <text x="535" y="619" font-family="sans-serif" font-size="14" fill="#334155">RepositorioTransacciones / ComprobanteTransferencia</text>
 <text x="535" y="643" font-family="sans-serif" font-size="16" fill="#334155">NotificacionTransferencia / AuditoriaTransferencia</text>
 <text x="535" y="667" font-family="sans-serif" font-size="16" fill="#334155">CanalNotificacion</text>
-<rect x="520" y="800" width="450" height="130" rx="8" fill="#e0f2fe" stroke="#64748b"/>
+<rect x="520" y="800" width="450" height="140" rx="8" fill="#e0f2fe" stroke="#64748b"/>
 <text x="535" y="828" font-family="sans-serif" font-size="18" font-weight="bold" fill="#0f172a">Adaptadores de salida</text>
 <text x="535" y="854" font-family="sans-serif" font-size="16" fill="#334155">PostgresRepositorio / OracleRepositorio</text>
 <text x="535" y="878" font-family="sans-serif" font-size="15" fill="#334155">NotificadorTransferencia / canales SMS y push</text>
 <text x="535" y="902" font-family="sans-serif" font-size="16" fill="#334155">AuditoriaCompuesta / registro y antifraude</text>
+<text x="535" y="926" font-family="sans-serif" font-size="16" fill="#334155">InfraestructuraProduccion crea la familia</text>
 <rect x="30" y="800" width="440" height="130" rx="8" fill="#f1f5f9" stroke="#64748b"/>
 <text x="45" y="828" font-family="sans-serif" font-size="18" font-weight="bold" fill="#0f172a">Productos de apoyo</text>
 <text x="45" y="854" font-family="sans-serif" font-size="16" fill="#334155">Cuenta implementa CuentaTransaccional.</text>
@@ -47,6 +50,6 @@ El núcleo (aplicación, dominio y puertos) no importa implementaciones de infra
 <text x="760" y="764" font-family="sans-serif" font-size="15" fill="#334155">implementan / usan</text>
 <path d="M 245 800 V 720" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#flecha)"/>
 <text x="45" y="764" font-family="sans-serif" font-size="15" fill="#334155">implementa contrato</text>
-<text x="35" y="965" font-family="sans-serif" font-size="15" fill="#475569">Flechas: dependencia de código hacia contratos y reglas. Main ensambla los adaptadores.</text>
+<text x="35" y="965" font-family="sans-serif" font-size="15" fill="#475569">Flechas: dependencia de código hacia contratos y reglas. InfraestructuraProduccion crea los adaptadores.</text>
 <text x="35" y="988" font-family="sans-serif" font-size="15" fill="#475569">El núcleo (aplicación, dominio y puertos) no importa implementaciones de infraestructura.</text>
 </svg>

@@ -1,0 +1,32 @@
+classDiagram
+direction TB
+class TransaccionService {
+  <<Client>>
+}
+class CalculadoraComision {
+  <<Context>>
+  -Map~String, PoliticaComision~ politicas
+  +calcular(monto, tipo) double
+}
+class PoliticaComision {
+  <<Strategy>>
+  +calcular(monto) double
+}
+class ComisionMismoBanco {
+  <<ConcreteStrategy>>
+}
+class ComisionOtroBanco {
+  <<ConcreteStrategy>>
+}
+class ComisionInternacional {
+  <<ConcreteStrategy>>
+}
+class ComisionLlave {
+  <<ConcreteStrategy>>
+}
+TransaccionService --> CalculadoraComision : CalculoComision
+CalculadoraComision o-- PoliticaComision : una por tipo
+PoliticaComision <|.. ComisionMismoBanco
+PoliticaComision <|.. ComisionOtroBanco
+PoliticaComision <|.. ComisionInternacional
+PoliticaComision <|.. ComisionLlave
