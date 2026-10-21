@@ -15,7 +15,7 @@ import co.edu.unal.banco.transferencias.dominio.ComisionLlave;
 import co.edu.unal.banco.transferencias.dominio.ComisionMismoBanco;
 import co.edu.unal.banco.transferencias.dominio.ComisionOtroBanco;
 import co.edu.unal.banco.transferencias.puertos.entrada.TransferirFondos;
-
+import co.edu.unal.banco.transferencias.dominio.ComisionPagoServicios;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -30,6 +30,7 @@ public class Main {
             .comision("OTRO_BANCO", new ComisionOtroBanco())
             .comision("INTERNACIONAL", new ComisionInternacional())
             .comision("LLAVE", new ComisionLlave())
+            .comision("PAGO_SERVICIOS", new ComisionPagoServicios())
             .infraestructura(new InfraestructuraProduccion())
             .construir();
         servicio.transferir(ana, luis, 150_000, "OTRO_BANCO");

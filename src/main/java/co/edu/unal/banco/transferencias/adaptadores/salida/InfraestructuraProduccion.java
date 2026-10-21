@@ -19,7 +19,7 @@ public class InfraestructuraProduccion implements InfraestructuraTransferencias 
 
     public NotificacionTransferencia crearNotificacion() {
         return new NotificadorTransferencia(new CanalNotificacionCompuesto(
-            List.of(new SmsGateway(), new PushGateway())));
+            List.of(new SmsGateway(), new PushGateway(), new WhatsAppGateway())));
     }
 
     public AuditoriaTransferencia crearAuditoria() {

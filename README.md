@@ -11,8 +11,8 @@ Ruta A. Componente de transferencias en Java 21, dentro de un monolito modular c
 | 3 | [Componente, puertos, adaptadores y clases](docs/lab3/03-componente.md) |
 | 4 | [Diagrama de clases, evidencia SOLID y ejemplos de antes y después](docs/lab3/04-solid.md) |
 | 5 | [Fichas de los seis patrones de diseño](docs/lab3/05-patrones.md) |
-
-Las fases 6 y 7 quedan pendientes. Los diagramas SVG se muestran dentro de los documentos y se pueden editar como archivos vectoriales.
+| 6 | [Evidencia de la ruta A: pruebas, trazabilidad y atributos de calidad](docs/lab3/06-evidencia.md) |
+| 7 | [Prueba de evolución: tres escenarios de cambio](docs/lab3/07-evolucion.md) |
 
 ## Ejecución
 
